@@ -155,7 +155,7 @@ def main(sess,age,gender,train_mode,images_pl):
 
                     Logger.log("NEW FACE! {}".format(newFace.id))
 
-                if area < biggest_img:
+                if area > biggest_img:
                     biggest_img = area
                     current_usr = deets
 

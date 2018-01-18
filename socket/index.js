@@ -83,106 +83,11 @@ var _socket;
 console.log('starting socket')
 io.on('connection', function (socket) {
     _socket = socket;
-    _socket.on('media-change', function (frame) {
-        _socket.broadcast.emit('media-change', frame);
-
-        fb.database().ref('devices/' + uuid).update({
-            'frame': frame
-        });
-    })
-    _socket.on('config', function (n, fn) {
-        console.log('config-response')
-        fn({
-            'device-name': device_name,
-            'device-id': uuid,
-            // 'ad-set-id': adSetId
-        });
-    })
-    _socket.on('frame', function (frame) {
-        _socket.broadcast.emit('frame', frame);
+ 
+    _socket.on('current-user', function (usr) {
+        _socket.broadcast.emit('current-user', usr.details);
     });
-    _socket.on('ad-change', function (frame) {
-        console.log('ad change')
-        var ad = frame;
-        for (var x = 0; x < _adData.length; x++) {
-            if (_adData[x].name == ad.url) {
-                _adData[x].slots[_adData[x].slots.length] = {
-                    start: new Date(),
-                    views: 0,
-                    males: 0,
-                    age: 0
-                }
-
-                if (_lastAd != -1) {
-                    var lastAd = _adData[_lastAd].slots[_adData[_lastAd].slots.length - 1];
-                    lastAd.end = new Date();
-                    console.log(lastAd.end - lastAd.start)
-                }
-
-                _lastAd = x;
-                break;
-            }
-        }
-    })
-    _socket.on('session', function (frame) {
-        console.log('new session! ' + JSON.stringify(frame))
-        _deviceData['session-ct']++;
-        _deviceData['session-len'] += frame.duration;
-        _deviceData['latest-session'] = frame;
-
-        if (frame.gender.toLowerCase() == 'male')
-            _deviceData['male-ct']++;
-        else
-            _deviceData['female-ct']++;
-
-        if (frame.age < 18)
-            _deviceData['youth-ct']++;
-        else {
-            if (frame.age < 28)
-                _deviceData['young-ct']++;
-            else {
-                if (frame.age < 55)
-                    _deviceData['adult-ct']++;
-                else
-                    _deviceData['senior-ct']++;
-            }
-        }
-
-        var winStart = new Date(frame.started * 1000);
-        var winEnd = new Date((frame.started * 1000) + (frame.duration * 1000));
-
-        var adData = [];
-        for (var x = 0; x < _adData.length; x++) {
-            adData[x] = {
-                name: _adData[x].name,
-                males: 0,
-                age: 0,
-                views: 0,
-                viewLength: 0
-            }
-            for (var y = 0; y < _adData[x].slots.length; y++) {
-                var slot = _adData[x].slots[y];
-
-                var endedIn = (slot.start < winEnd && slot.end > winEnd) || (slot.start < winEnd && slot.end == null);
-                var startedIn = slot.start < winStart && slot.end > winStart;
-                var watchedAll = winStart < slot.start && winEnd > slot.end;
-                if (endedIn || startedIn || watchedAll) {
-                    slot.views++;
-                    if (frame.gender.toLowerCase() == 'male') {
-                        slot.males++;
-                    }
-                    slot.age += frame.age;
-                }
-                adData[x].views += slot.views;
-                adData[x].age += slot.age;
-                adData[x].males += slot.males;
-                adData[x].viewLength += 0; //slot.end - slot.start;
-            }
-        }
-
-        _deviceData.adData = adData;
-        fb.database().ref('devices/' + uuid).set(_deviceData);
-    })
+   
 })
 
 module.exports = app
