@@ -10,6 +10,7 @@ import dlib
 import arrow
 import numpy as np
 from scipy.spatial import distance
+from socketIO_client import SocketIO, LoggingNamespace
 
 import inception_resnet_v1
 import tensorflow as tf
@@ -34,6 +35,9 @@ def main(sess,age,gender,train_mode,images_pl):
     FACE_MATCH = .6
 
     Logger.log('running in Local mode: {}'.format(LOCAL_MODE))
+
+    socketIO = SocketIO('localhost', 3003, LoggingNamespace)
+    Logger.log("Connected to socket.io")
 
     camera_port = 0
     if not LOCAL_MODE:
@@ -107,6 +111,8 @@ def main(sess,age,gender,train_mode,images_pl):
 
         frame_mod = frame_ct % FRAME_SKIP
 
+        current_usr = ''
+        biggest_img = 0
         for k, d in enumerate(detected):
             if frame_mod == 0:
 
@@ -118,6 +124,8 @@ def main(sess,age,gender,train_mode,images_pl):
                 # drawing the rectangle & label
                 x1, y1, x2, y2, w, h = d.left(), d.top(), d.right() + 1, d.bottom() + 1, d.width(), d.height()
                 cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 2)
+
+                area = d.width() * d.height()
 
                 deets = ''
                 for face in tracked_faces:
@@ -146,8 +154,15 @@ def main(sess,age,gender,train_mode,images_pl):
 
                     Logger.log("NEW FACE! {}".format(newFace.id))
 
+                if area > biggest_img:
+                    biggest_img = area
+                    current_usr = deets
+
                 if LOCAL_MODE:
                     draw_label(img, (d.left(), d.top()), deets)
+
+        if biggest_img>0:
+            socketIO.emit('current-user', deets)
 
         if LOCAL_MODE:
             win.set_image(img)
