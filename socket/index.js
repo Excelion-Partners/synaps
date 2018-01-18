@@ -83,11 +83,14 @@ var _socket;
 console.log('starting socket')
 io.on('connection', function (socket) {
     _socket = socket;
- 
+
     _socket.on('current-user', function (usr) {
         _socket.broadcast.emit('current-user', usr.details);
     });
-   
+
+    _socket.on('frame', function (frame) {
+        _socket.broadcast.emit('frame', frame);
+    });
 })
 
 module.exports = app

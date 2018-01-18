@@ -167,6 +167,12 @@ def main(sess,age,gender,train_mode,images_pl):
 
         if LOCAL_MODE:
             win.set_image(img)
+        else:
+            encImg = cv2.imencode('.png', img[:])
+            buff = base64.b64encode(encImg[1])
+    
+            socketIO.emit('frame', {"buffer": buff.decode(
+            'utf-8')})
 
 def load_network(model_path):
     sess = tf.Session()

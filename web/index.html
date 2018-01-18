@@ -38,6 +38,9 @@
                     _socket.on('current-user', function (data) {
                         $('#display-div').html(data);
                     });
+                    _socket.on('frame', function (data) {
+                        $('#current-img').prop('src', 'data:image/png;base64,' + data.buffer);
+                    });
                 });
 
                 _socket.on('disconnect', function () {});
@@ -51,6 +54,7 @@
 <body>
     <div id="display-div">
     </div>
+    <img id="current-img" src="https://i.ytimg.com/vi/lul-Y8vSr0I/hqdefault.jpg" />
 </body>
 
 </html>
