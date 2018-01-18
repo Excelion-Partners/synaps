@@ -36,8 +36,9 @@ def main(sess,age,gender,train_mode,images_pl):
 
     Logger.log('running in Local mode: {}'.format(LOCAL_MODE))
 
-    socketIO = SocketIO('localhost', 3003, LoggingNamespace)
-    Logger.log("Connected to socket.io")
+    if not LOCAL_MODE:
+        socketIO = SocketIO('localhost', 3003, LoggingNamespace)
+        Logger.log("Connected to socket.io")
 
     camera_port = 0
     if not LOCAL_MODE:
@@ -161,7 +162,7 @@ def main(sess,age,gender,train_mode,images_pl):
                 if LOCAL_MODE:
                     draw_label(img, (d.left(), d.top()), deets)
 
-        if biggest_img>0:
+        if biggest_img>0 and not LOCAL_MODE:
             socketIO.emit('current-user', deets)
 
         if LOCAL_MODE:
