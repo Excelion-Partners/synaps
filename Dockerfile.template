@@ -165,6 +165,9 @@ WORKDIR /usr/src/socket
 RUN JOBS=MAX npm install --unsafe-perm --production \
 	&& npm cache clean --force 
 
+# web
+COPY ./web /var/www
+
 # bash
 COPY ./bash /usr/bash
 COPY ./start.sh /usr/
