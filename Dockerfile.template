@@ -38,6 +38,7 @@ RUN apt-get install --force-yes --fix-missing -y \
     dnsmasq \
     hostapd \
     unzip \
+	software-properties-common python-software-properties \
     cmake \
     iproute2 \
     python-dev \
