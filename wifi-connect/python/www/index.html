@@ -1,0 +1,188 @@
+<html !DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <title>Interface Setup</title>
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container" ng-app="interfaceApp" ng-controller="interfaceController">
+      <br/><br/>
+
+      <h1>Network Connect</h1>
+
+      <br/>
+
+      <div class="row">
+        <div class="row">
+          <div class="form-group">
+            <div class="col-lg-6">
+              <input type="checkbox" ng-model="pageObject.wifiMaster">&nbsp;&nbsp;
+              <label class="form-label">Use wireless as the default route to the internet?</label>
+              <p>This option is only applicable if you are communicating over the internet using the wireless interface and communicating with a separate network using the ethernet interface</p>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <br/>
+
+      <div class="row" ng-repeat="interface in pageObject.ethernetInterfaces">
+        <div class="panel panel-default">
+          <div class="panel-heading"><label>Ethernet ({{interface.ifaceName}})</label> <span style="float:right;"><input type="checkbox" ng-model="interface.enabled">&nbsp;&nbsp;<label>ENABLED</label></span></div>
+          <div class="panel-body" ng-show="interface.enabled">
+
+            <div class="row">
+				      <div class="form-group">
+				        <div class="col-lg-6">
+				          <input type="checkbox" ng-model="interface.dhcp">
+				          <label class="form-label">DHCP</label>
+				        </div>
+				      </div>
+				    </div>
+            <br/>
+
+            <div ng-show="interface.dhcp==false">
+
+              <div class="row">
+  				      <div class="form-group">
+  				        <div class="col-lg-6">
+                    <label class="form-label">Static Ip</label>
+                    <br/>
+  				          <input type="text" class="form-control" ng-model="interface.staticIp">
+  				        </div>
+  				      </div>
+  				    </div>
+
+              <br/>
+
+              <div class="row">
+  				      <div class="form-group">
+  				        <div class="col-lg-6">
+                    <label class="form-label">Netmask</label>
+                    <br/>
+  				          <input type="text" class="form-control" ng-model="interface.staticNetmask">
+  				        </div>
+  				      </div>
+  				    </div>
+
+              <br/>
+
+              <div class="row">
+  				      <div class="form-group">
+  				        <div class="col-lg-6">
+                    <label class="form-label">Gateway</label>
+                    <br/>
+  				          <input type="text" class="form-control" ng-model="interface.staticGateway">
+  				        </div>
+  				      </div>
+  				    </div>
+              <br/>
+            </div>
+
+          </div>
+        </div>
+        <br/>
+      </div>
+
+      <div class="row" ng-repeat="interface in pageObject.wirelessInterfaces">
+        <div class="panel panel-default">
+          <div class="panel-heading"><label>Wireless ({{interface.ifaceName}})</label> <span style="float:right;"><input type="checkbox" ng-model="interface.enabled">&nbsp;&nbsp;<label>ENABLED</label></span></div>
+          <div class="panel-body" ng-show="interface.enabled">
+
+            <div class="row">
+				      <div class="form-group">
+				        <div class="col-lg-6">
+                  <label class="form-label">SSID</label>
+                  <br/>
+				          <input type="text" class="form-control" ng-model="interface.ssid">
+				        </div>
+				      </div>
+				    </div>
+
+            <br/>
+
+            <div class="row">
+				      <div class="form-group">
+				        <div class="col-lg-6">
+                  <label class="form-label">Passphrase</label>
+                  <br/>
+				          <input type="password" class="form-control" ng-model="interface.passphrase">
+				        </div>
+				      </div>
+				    </div>
+
+            <br/>
+
+            <div class="row">
+				      <div class="form-group">
+				        <div class="col-lg-6">
+				          <input type="checkbox" ng-model="interface.dhcp">
+				          <label class="form-label">DHCP</label>
+				        </div>
+				      </div>
+				    </div>
+            <br/>
+
+            <div ng-show="interface.dhcp==false">
+
+              <div class="row">
+  				      <div class="form-group">
+  				        <div class="col-lg-6">
+                    <label class="form-label">Static Ip</label>
+                    <br/>
+  				          <input type="text" class="form-control" ng-model="interface.staticIp">
+  				        </div>
+  				      </div>
+  				    </div>
+
+              <br/>
+
+              <div class="row">
+  				      <div class="form-group">
+  				        <div class="col-lg-6">
+                    <label class="form-label">Netmask</label>
+                    <br/>
+  				          <input type="text" class="form-control" ng-model="interface.staticNetmask">
+  				        </div>
+  				      </div>
+  				    </div>
+
+              <br/>
+
+              <div class="row">
+  				      <div class="form-group">
+  				        <div class="col-lg-6">
+                    <label class="form-label">Gateway</label>
+                    <br/>
+  				          <input type="text" class="form-control" ng-model="interface.staticGateway">
+  				        </div>
+  				      </div>
+  				    </div>
+              <br/>
+            </div>
+
+          </div>
+        </div>
+        <br/>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <div class="col-lg-6">
+            <div class="btn btn-primary" ng-disabled="saveButtonEnabled==false" ng-click="saveInterfaces()" style="width:150px;">Save</div>
+          </div>
+        </div>
+      </div>
+      <br/>
+    </div>
+
+    <script src="bootstrap/jquery.min.js"></script>
+    <script src="bootstrap/bootstrap.min.js"></script>
+    <script src="angular/angular.min.js"></script>
+    <!-- get available interfaces from network manager -->
+    <script type="text/javascript" src="js/interface-controller.js"></script>
+  </body>
+</html>
