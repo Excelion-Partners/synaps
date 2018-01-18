@@ -33,25 +33,14 @@
                 _socket = io(src);
                 _socket.on('connect', function () {
                     console.log('connected')
+
+                    _socket.on('current-user', function (data) {
+                        $('#display-div').html(data);
+                    });
                 });
 
                 _socket.on('disconnect', function () {});
             }
-
-            var imgs = ['http://www.art-dept.net/wp-content/uploads/2013/03/blue_label.jpg',
-                'https://i.ytimg.com/vi/cZd9MAYmSPU/maxresdefault.jpg', '08emcxcuGow'
-            ];
-            var index = 0;
-            $('#switch1').click(function () {
-                index++;
-                if (index >= imgs.length)
-                    index = 0;
-
-                _socket.emit('media-change', {
-                    url: imgs[index]
-                });
-
-            });
 
             init();
         })
@@ -60,7 +49,6 @@
 
 <body>
     <div id="display-div">
-        <a href="#" id="switch1">Switch</a>
     </div>
 </body>
 
