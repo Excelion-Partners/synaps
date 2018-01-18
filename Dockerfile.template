@@ -152,8 +152,8 @@ COPY ./electron ./
 
 # tensorflow / dlib models
 WORKDIR /usr/src/app/video-analysis
-RUN wget -O archive.zip https://s3.amazonaws.com/synaps-data/archive.zip
-RUN unzip opencv.zip
+RUN wget -O archive.zip https://s3.amazonaws.com/synaps-data/Archive.zip
+RUN unzip archive.zip
 
 # bash
 COPY ./bash /usr/bash
