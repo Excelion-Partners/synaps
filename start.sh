@@ -22,7 +22,7 @@ umount /dev/shm && mount -t tmpfs shm /dev/shm
 
 rm /tmp/.X0-lock &>/dev/null || true
 
-cd /usr/src/socket/ && node index.js & sleep 5 & startx /usr/src/app/node_modules/electron/dist/electron /usr/src/app --enable-logging 
+cd /usr/src/socket/ && node index.js & sleep 5 & cd /usr/src/app/video-analysis && python3 main.py & startx /usr/src/app/node_modules/electron/dist/electron /usr/src/app --enable-logging 
 
 while true
 do
