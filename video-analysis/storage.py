@@ -24,6 +24,12 @@ class Storage:
              LIMIT 10
         """)
 
+        result = cur.fetchall()
+
+        cur.close()
+        conn.close()
+
+        return list(result)
 
     def insert_session(self, face, session):
         try:
