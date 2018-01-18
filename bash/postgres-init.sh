@@ -44,8 +44,7 @@ if [ "$EXISTED" -eq "1" ]; then
 
     sudo -u postgres /usr/lib/postgresql/9.6/bin/psql -d postgres -c "ALTER USER ${PGUSER} with encrypted password '${PGPASS}';"
     sudo -u postgres /usr/lib/postgresql/9.6/bin/psql -d postgres -c "CREATE DATABASE synaps WITH OWNER = ${PGUSER} CONNECTION LIMIT = -1;"
-    sudo -u synaps /usr/lib/postgresql/9.6/bin/psql -U postgres -d synaps -a -f /usr/postgres/init.sql
-    sudo -u synaps /usr/lib/postgresql/9.6/bin/psql -U postgres -d synaps -a -f /usr/postgres/db_test_script.sql
+    sudo -u synaps /usr/lib/postgresql/9.6/bin/psql -d synaps -a -f /usr/postgres/init.sql
 
     echo "Database initialized"
 fi
