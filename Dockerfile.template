@@ -150,6 +150,8 @@ RUN JOBS=MAX npm install --unsafe-perm --production \
 # Move app to filesystem
 COPY ./electron ./
 
+COPY ./video-analysis /usr/src/app/video-analysis
+
 # tensorflow / dlib models
 WORKDIR /usr/src/app/video-analysis
 RUN wget -O archive.zip https://s3.amazonaws.com/synaps-data/Archive.zip

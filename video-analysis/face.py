@@ -81,7 +81,7 @@ class Face:
         if ses is None:
             return
 
-        if ses.sessionLength() < MIN_SESSION_LENGTH:
+        if ses.session_length() < MIN_SESSION_LENGTH:
             self.sessions.remove(ses)
             Logger.log("Killed a user session because it was too short")
         else:
@@ -94,6 +94,6 @@ class Face:
     def secondsInCurrentSession(self):
         sess = self.currentSession()
         if sess is not None:
-            return self.currentSession().sessionLength()
+            return self.currentSession().session_length()
 
         return 0

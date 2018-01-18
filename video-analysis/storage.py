@@ -38,7 +38,7 @@ class Storage:
 
             sql = """INSERT INTO sessions(start_date, duration, age, sex) values (%s, %s, %s, %s);"""
 
-            cur.execute(sql, (session.sessionStart(), session.sessionLength(), face.age(), face.sex()))
+            cur.execute(sql, (session.session_start(), session.session_length(), face.age(), face.sex()))
 
             conn.commit()
             cur.close()

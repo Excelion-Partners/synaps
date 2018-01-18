@@ -9,8 +9,8 @@ class FaceSession:
         self.complete = False
         self.ads = []
 
-    def sessionStart(self):
+    def session_start(self):
         return self.firstSeen.datetime
 
-    def sessionLength(self):
+    def session_length(self):
         return (self.lastSeen - self.firstSeen).total_seconds()
