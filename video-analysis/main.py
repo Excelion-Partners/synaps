@@ -155,7 +155,7 @@ def main(sess,age,gender,train_mode,images_pl):
 
                     Logger.log("NEW FACE! {}".format(newFace.id))
 
-                if area > biggest_img:
+                if area < biggest_img:
                     biggest_img = area
                     current_usr = deets
 
@@ -163,7 +163,7 @@ def main(sess,age,gender,train_mode,images_pl):
                     draw_label(img, (d.left(), d.top()), deets)
 
         if biggest_img>0 and not LOCAL_MODE:
-            socketIO.emit('current-user', deets)
+            socketIO.emit('current-user',{'details': current_usr})
 
         if LOCAL_MODE:
             win.set_image(img)
