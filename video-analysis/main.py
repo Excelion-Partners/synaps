@@ -162,7 +162,7 @@ def main(sess,age,gender,train_mode,images_pl):
                 if LOCAL_MODE:
                     draw_label(img, (d.left(), d.top()), deets)
 
-        if biggest_img>0 and not LOCAL_MODE:
+        if not LOCAL_MODE:
             socketIO.emit('current-user',{'details': current_usr})
 
         if LOCAL_MODE:
