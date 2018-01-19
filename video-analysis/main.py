@@ -73,50 +73,52 @@ def main(sess,age,gender,train_mode,images_pl):
         now = arrow.now()
 
         ret, img = cap.read()
-        if not ret:
-            print("error: failed to capture image")
-            return -1
-
-        #img = imutils.resize(img, width=MAX_FRAME_WIDTH)
-        #img = cv2.flip(img, 1)
-
-        input_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img_h, img_w, _ = np.shape(input_img)
-
-        detected = detector(input_img, 1)
-
-        people_in_last_frame = len(detected)
-        faces = np.empty((len(detected), img_size, img_size, 3))
-
-        # align the faces
-        for i, d in enumerate(detected):
-            faces[i, :, :, :] = fa.align(input_img, gray, detected[i])
-
-        # compute the ages / genders
-        if people_in_last_frame > 0:
-            ages,genders = sess.run([age, gender], feed_dict={images_pl: faces, train_mode: False})
-
-        # iterate all the existing tracked_faces we know of and clean them up
-        for face in tracked_faces:
-            latest_session = face.mostRecentSession()
-            face.checkSessionTimeout()
-
-            if latest_session is not None:
-                if (now - latest_session.lastSeen).total_seconds() >= REMOVE_USER_TIMEOUT_SECONDS:
-                    tracked_faces.remove(face)
-
-        if faces_tracked != len(tracked_faces):
-            Logger.log('{} tracked face'.format(len(tracked_faces)))
-            faces_tracked = len(tracked_faces)
-
+        frame_ct += 1
         frame_mod = frame_ct % FRAME_SKIP
 
-        current_usr = ''
-        biggest_img = 0
-        for k, d in enumerate(detected):
-            if frame_mod == 0:
+        if frame_mod == 0:
+            if not ret:
+                print("error: failed to capture image")
+                return -1
 
+            #img = imutils.resize(img, width=MAX_FRAME_WIDTH)
+            #img = cv2.flip(img, 1)
+
+            input_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            img_h, img_w, _ = np.shape(input_img)
+
+            detected = detector(input_img, 1)
+
+            people_in_last_frame = len(detected)
+            faces = np.empty((len(detected), img_size, img_size, 3))
+
+            # align the faces
+            for i, d in enumerate(detected):
+                faces[i, :, :, :] = fa.align(input_img, gray, detected[i])
+
+            # compute the ages / genders
+            if people_in_last_frame > 0:
+                ages,genders = sess.run([age, gender], feed_dict={images_pl: faces, train_mode: False})
+
+            # iterate all the existing tracked_faces we know of and clean them up
+            for face in tracked_faces:
+                latest_session = face.mostRecentSession()
+                face.checkSessionTimeout()
+
+                if latest_session is not None:
+                    if (now - latest_session.lastSeen).total_seconds() >= REMOVE_USER_TIMEOUT_SECONDS:
+                        tracked_faces.remove(face)
+
+            if faces_tracked != len(tracked_faces):
+                Logger.log('{} tracked face'.format(len(tracked_faces)))
+                faces_tracked = len(tracked_faces)
+
+            current_usr = ''
+            biggest_img = 0
+        
+            for k, d in enumerate(detected):
+            
                 shape = predictor(img, d)
                 face_descriptor = faceRecog.compute_face_descriptor(img, shape)
 
@@ -162,17 +164,19 @@ def main(sess,age,gender,train_mode,images_pl):
                 if LOCAL_MODE:
                     draw_label(img, (d.left(), d.top()), deets)
 
-        if not LOCAL_MODE:
-            socketIO.emit('current-user',{'details': current_usr})
+            if not LOCAL_MODE:
+                socketIO.emit('current-user',{'details': current_usr})
 
-        if LOCAL_MODE:
-            win.set_image(img)
-        else:
-            encImg = cv2.imencode('.png', img[:])
-            buff = base64.b64encode(encImg[1])
-    
-            socketIO.emit('frame', {"buffer": buff.decode(
-            'utf-8')})
+            if LOCAL_MODE:
+                win.set_image(img)
+            else:
+                encImg = cv2.imencode('.png', img[:])
+                buff = base64.b64encode(encImg[1])
+
+                frame = imutils.resize(frame, width=320)
+        
+                socketIO.emit('frame', {"buffer": buff.decode(
+                'utf-8')})
 
 def load_network(model_path):
     sess = tf.Session()
