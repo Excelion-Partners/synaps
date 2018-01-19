@@ -1,4 +1,4 @@
-FROM rmoorexcelion/synaps-base
+FROM rmoorexcelion/synaps-base:latest
 
 # Move to app dir
 RUN mkdir /usr/src/app
