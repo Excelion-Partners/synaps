@@ -65,10 +65,16 @@ class Face:
         self.sex_ct += 1
 
     def sex(self):
+        if (self.sex_ct == 0):
+            return '--'
+
         sx = float(self.sex_tot) / float(self.sex_ct)
         return 'Male' if sx > .5 else 'Female'
 
     def age(self):
+        if self.age_ct == 0:
+            return 0
+
         age = float(self.age_tot) / float(self.age_ct)
         return age
 

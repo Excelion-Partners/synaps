@@ -29,7 +29,9 @@ def draw_label(image, point, label, font=cv2.FONT_HERSHEY_SIMPLEX,
 
 def main(sess,age,gender,train_mode,images_pl):
     LOCAL_MODE = os.getenv('LOCAL_MODE', 'True') == 'True'
-    FRAME_SKIP = int(os.getenv('FRAME_SKIP', 4))
+    TIME_BETWEEN_READS = float(os.getenv('TIME_BETWEEN_READS', .3))
+    TIME_BETWEEN_DEMO = float(os.getenv('TIME_BETWEEN_DEMO', 1))
+    LIVE_VIDEO = True
     REMOVE_USER_TIMEOUT_SECONDS = int(
         os.getenv('REMOVE_USER_TIMEOUT_SECONDS', 60))  # seconds
     FACE_MATCH = .6
@@ -68,15 +70,17 @@ def main(sess,age,gender,train_mode,images_pl):
     tracked_faces = []
     frame_ct = 0
 
+    last_read = arrow.now()
+    last_demo = arrow.now()
+
     while True:
-        face_descs = []
         now = arrow.now()
 
-        ret, img = cap.read()
-        frame_ct += 1
-        frame_mod = frame_ct % FRAME_SKIP
+        rd = (now - last_read).total_seconds()
+        if (rd > TIME_BETWEEN_READS):
+            last_read = arrow.now()
 
-        if frame_mod == 0:
+            ret, img = cap.read()
             if not ret:
                 print("error: failed to capture image")
                 return -1
@@ -98,8 +102,13 @@ def main(sess,age,gender,train_mode,images_pl):
                 faces[i, :, :, :] = fa.align(input_img, gray, detected[i])
 
             # compute the ages / genders
-            if people_in_last_frame > 0:
+            ld = (now - last_demo).total_seconds()
+            ages = []
+            genders = []
+            if people_in_last_frame > 0 and ld > TIME_BETWEEN_DEMO:
                 ages,genders = sess.run([age, gender], feed_dict={images_pl: faces, train_mode: False})
+                Logger.log("{}".format(ld))
+                last_demo = arrow.now()
 
             # iterate all the existing tracked_faces we know of and clean them up
             for face in tracked_faces:
@@ -116,9 +125,9 @@ def main(sess,age,gender,train_mode,images_pl):
 
             current_usr = ''
             biggest_img = 0
-        
+
             for k, d in enumerate(detected):
-            
+
                 shape = predictor(img, d)
                 face_descriptor = faceRecog.compute_face_descriptor(img, shape)
 
@@ -141,17 +150,19 @@ def main(sess,age,gender,train_mode,images_pl):
                         face.recordVisit()
                         face.descriptor = face_descriptor
 
-                        face.add_age(int(ages[i]))
-                        face.add_sex(genders[i])
+                        if len(ages) > 0:
+                            face.add_age(int(ages[i]))
+                            face.add_sex(genders[i])
 
-                        deets = face.detailStr() 
+                        deets = face.detailStr()
 
                 if not found:
                     newFace = Face(face_descriptor)
                     tracked_faces.append(newFace)
 
-                    newFace.add_age(int(ages[i]))
-                    newFace.add_sex(genders[i])
+                    if len(ages) > 0:
+                        newFace.add_age(int(ages[i]))
+                        newFace.add_sex(genders[i])
 
                     deets = newFace.detailStr()
 
@@ -161,21 +172,21 @@ def main(sess,age,gender,train_mode,images_pl):
                     biggest_img = area
                     current_usr = deets
 
-                #if LOCAL_MODE:
-                draw_label(img, (d.left(), d.top()), deets)
+                if LIVE_VIDEO:
+                    draw_label(img, (d.left(), d.top()), deets)
 
-            if not LOCAL_MODE:
+            if not LOCAL_MODE and LIVE_VIDEO:
                 socketIO.emit('current-user',{'details': current_usr})
 
             if LOCAL_MODE:
                 win.set_image(img)
             else:
-                #tmp = imutils.resize(frame, width=320)
-                encImg = cv2.imencode('.png', img[:])
-                buff = base64.b64encode(encImg[1])
-        
-                socketIO.emit('frame', {"buffer": buff.decode(
-                'utf-8')})
+                if LIVE_VIDEO:
+                    encImg = cv2.imencode('.png', img[:])
+                    buff = base64.b64encode(encImg[1])
+
+                    socketIO.emit('frame', {"buffer": buff.decode(
+                    'utf-8')})
 
 def load_network(model_path):
     sess = tf.Session()
