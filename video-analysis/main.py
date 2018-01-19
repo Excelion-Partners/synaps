@@ -144,7 +144,7 @@ def main(sess,age,gender,train_mode,images_pl):
                         face.add_age(int(ages[i]))
                         face.add_sex(genders[i])
 
-                        deets = face.detailStr()
+                        deets = face.detailStr() 
 
                 if not found:
                     newFace = Face(face_descriptor)
@@ -161,8 +161,8 @@ def main(sess,age,gender,train_mode,images_pl):
                     biggest_img = area
                     current_usr = deets
 
-                if LOCAL_MODE:
-                    draw_label(img, (d.left(), d.top()), deets)
+                #if LOCAL_MODE:
+                draw_label(img, (d.left(), d.top()), deets)
 
             if not LOCAL_MODE:
                 socketIO.emit('current-user',{'details': current_usr})

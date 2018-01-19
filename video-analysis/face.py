@@ -73,7 +73,7 @@ class Face:
         return age
 
     def detailStr(self):
-       return '{0}yo {1}'.format(int(self.age()), self.sex())
+       return '{0}{1} {2}'.format(int(self.age()), self.sex(), self.id)
 
     def endCurrentSession(self):
         ses = self.currentSession()
