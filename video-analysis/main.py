@@ -79,7 +79,7 @@ def main(sess,age,gender,train_mode,images_pl):
         rd = (now - last_read).total_seconds()
         if (rd > TIME_BETWEEN_READS):
             
-            t = datetime.datetime.now()
+            t = time.time() # datetime.datetime.now()
 
             last_read = arrow.now()
 
@@ -114,26 +114,15 @@ def main(sess,age,gender,train_mode,images_pl):
                 
                 # align the faces
                 for i, d in enumerate(detected):
-                    #t = datetime.datetime.now()
                     faces[i, :, :, :] = fa.align(input_img, gray, detected[i])
-                    #t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
-                
-                    #Logger.log('aligner took {}s'.format(t_2))
                 
                 g = datetime.datetime.now()
                 ages,genders = sess.run([age, gender], feed_dict={images_pl: faces, train_mode: False})
-                g_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
+                g_2 = float((datetime.datetime.now() - g).microseconds) / 1000000
 
-                #Logger.log('age,gender took {}s'.format(t_2))
-
-                #Logger.log("{}".format(ld))
                 last_demo = arrow.now()
                 
             check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces)
-
-            if faces_tracked != len(tracked_faces):
-                Logger.log('{} tracked face'.format(len(tracked_faces)))
-                faces_tracked = len(tracked_faces)
 
             current_usr = ''
             biggest_img = 0
@@ -192,6 +181,10 @@ def main(sess,age,gender,train_mode,images_pl):
                 if LIVE_VIDEO:
                     draw_label(img, (d.left(), d.top()), deets)
 
+            if faces_tracked != len(tracked_faces):
+                Logger.log('{} tracked face'.format(len(tracked_faces)))
+                faces_tracked = len(tracked_faces)
+
             if not LOCAL_MODE and LIVE_VIDEO:
                 socketIO.emit('current-user',{'details': current_usr})
 
@@ -205,7 +198,7 @@ def main(sess,age,gender,train_mode,images_pl):
                     socketIO.emit('frame', {"buffer": buff.decode(
                     'utf-8')})
             
-            t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
+            t_2 = time.time()-t #float((datetime.datetime.now() - t).microseconds) / 1000000
 
             if fd_2 > 0:
                 Logger.log('total {0}s | detector {1}s | gender {2}s | descriptor {3}s '.format(t_2, d_2, g_2, fd_2))
