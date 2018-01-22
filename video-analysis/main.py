@@ -98,7 +98,9 @@ def main(sess,age,gender,train_mode,images_pl):
             # The 1 in the second argument indicates that we should upsample the image
             # 1 time.  This will make everything bigger and allow us to detect more
             # faces.
+            d = datetime.datetime.now()
             detected = detector(gray, 0)
+            d_2 = float((datetime.datetime.now() - d).microseconds) / 1000000
 
             people_in_last_frame = len(detected)
             faces = np.empty((len(detected), img_size, img_size, 3))
@@ -117,9 +119,9 @@ def main(sess,age,gender,train_mode,images_pl):
                 
                     #Logger.log('aligner took {}s'.format(t_2))
                 
-                #t = datetime.datetime.now()
+                g = datetime.datetime.now()
                 ages,genders = sess.run([age, gender], feed_dict={images_pl: faces, train_mode: False})
-                #t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
+                g_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
 
                 #Logger.log('age,gender took {}s'.format(t_2))
 
@@ -139,9 +141,9 @@ def main(sess,age,gender,train_mode,images_pl):
             for k, d in enumerate(detected):
 
                 shape = predictor(img, d)
-                #t = datetime.datetime.now()
+                fd = datetime.datetime.now()
                 face_descriptor = faceRecog.compute_face_descriptor(img, shape)
-                #t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
+                fd_2 = float((datetime.datetime.now() - fd).microseconds) / 1000000
 
                # Logger.log('face_descriptor took {}s'.format(t_2))
 
@@ -204,7 +206,7 @@ def main(sess,age,gender,train_mode,images_pl):
             
             t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
 
-            Logger.log('detector took {}s'.format(t_2))
+            Logger.log('total {0}s | detector {1}s | gender {2}s | descriptor {3}s '.format(t_2, d_2, g_2, fd_2))
 
 
 def check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces):
