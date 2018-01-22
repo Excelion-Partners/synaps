@@ -1,16 +1,13 @@
 FROM rmoorexcelion/synaps-base:latest
 
-# Move to app dir
-RUN mkdir /usr/src/app
-WORKDIR /usr/src/app
+WORKDIR /usr/app
 
 # Move app to filesystem
 COPY ./electron ./
-
-COPY ./video-analysis /usr/src/app/video-analysis
+COPY ./video-analysis /usr/app/video-analysis
 
 # tensorflow / dlib models
-WORKDIR /usr/src/app/video-analysis
+WORKDIR /usr/app/video-analysis
 RUN wget -O archive.zip https://s3.amazonaws.com/synaps-data/Archive.zip
 RUN unzip archive.zip
 
