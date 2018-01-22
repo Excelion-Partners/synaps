@@ -109,6 +109,7 @@ def main(sess,age,gender,train_mode,images_pl):
             ld = (now - last_demo).total_seconds()
             ages = []
             genders = []
+            g_2 = 0
             if people_in_last_frame > 0 and ld > TIME_BETWEEN_DEMO:
                 
                 # align the faces
@@ -127,8 +128,7 @@ def main(sess,age,gender,train_mode,images_pl):
 
                 #Logger.log("{}".format(ld))
                 last_demo = arrow.now()
-                Logger.log('computed demographics')
-
+                
             check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces)
 
             if faces_tracked != len(tracked_faces):
