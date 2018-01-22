@@ -31,7 +31,7 @@ def main(sess,age,gender,train_mode,images_pl):
     LOCAL_MODE = os.getenv('LOCAL_MODE', 'True') == 'True'
     TIME_BETWEEN_READS = float(os.getenv('TIME_BETWEEN_READS', .3))
     TIME_BETWEEN_DEMO = float(os.getenv('TIME_BETWEEN_DEMO', .5))
-    LIVE_VIDEO = True
+    LIVE_VIDEO =  os.getenv('LIVE_VIDEO', 'True') == 'True'
     REMOVE_USER_TIMEOUT_SECONDS = int(
         os.getenv('REMOVE_USER_TIMEOUT_SECONDS', 60))  # seconds
     FACE_MATCH = .6
