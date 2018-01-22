@@ -99,8 +99,7 @@ def main(sess,age,gender,train_mode,images_pl):
             # 1 time.  This will make everything bigger and allow us to detect more
             # faces.
             d = datetime.datetime.now()
-            tmp = imutils.resize(gray, width=320)
-            detected = detector(tmp, 0)
+            detected = detector(gray, 0)
             d_2 = float((datetime.datetime.now() - d).microseconds) / 1000000
 
             people_in_last_frame = len(detected)
