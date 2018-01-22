@@ -93,7 +93,10 @@ def main(sess,age,gender,train_mode,images_pl):
             img_h, img_w, _ = np.shape(input_img)
 
             t = datetime.datetime.now()
-            detected = detector(gray, 1)
+            # The 1 in the second argument indicates that we should upsample the image
+            # 1 time.  This will make everything bigger and allow us to detect more
+            # faces.
+            detected = detector(gray, 0)
             t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
 
             Logger.log('detector took {}s'.format(t_2))
