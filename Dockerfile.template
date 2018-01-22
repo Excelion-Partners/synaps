@@ -1,19 +1,38 @@
 FROM rmoorexcelion/synaps-base:latest
 
+# Move to app dir
+RUN mkdir /usr/app
 WORKDIR /usr/app
 
-# Move app to filesystem
-COPY ./electron ./
-COPY ./video-analysis /usr/app/video-analysis
+# Set Xorg and FLUXBOX preferences
+RUN mkdir ~/.fluxbox
+RUN echo "xset s off" > ~/.fluxbox/startup && echo "xserver-command=X -s 0 dpms" >> ~/.fluxbox/startup
+RUN echo "#!/bin/bash" > /etc/X11/xinit/xserverrc \
+  && echo "" >> /etc/X11/xinit/xserverrc \
+  && echo 'exec /usr/bin/X -s 0 dpms -nocursor -nolisten tcp "$@"' >> /etc/X11/xinit/xserverrc
+
+# Move package.json to filesystem
+RUN mkdir /usr/app/electron
+WORKDIR /usr/app/electron
+COPY ./electron/package.json ./
+
+# Install npm modules for the application
+RUN JOBS=MAX npm install --unsafe-perm --production \
+	&& npm cache clean --force && node_modules/.bin/electron-rebuild
+
+COPY ./electron .
 
 # tensorflow / dlib models
+RUN mkdir /usr/app/video-analysis
 WORKDIR /usr/app/video-analysis
 RUN wget -O archive.zip https://s3.amazonaws.com/synaps-data/Archive.zip
 RUN unzip archive.zip
+COPY ./video-analysis .
 
 # socket
-COPY ./socket /usr/src/socket
-WORKDIR /usr/src/socket
+RUN mkdir /usr/app/socket
+COPY ./socket /usr/app/socket
+WORKDIR /usr/app/socket
 RUN JOBS=MAX npm install --unsafe-perm --production \
 	&& npm cache clean --force 
 

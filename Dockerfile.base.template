@@ -130,20 +130,3 @@ COPY ./postgres/init.sql /usr/postgres/init.sql
 RUN apt-get update && apt-get install php5-pgsql phppgadmin
 COPY ./postgres/phppgadmin.conf /etc/apache2/conf-available/
 
-# Set Xorg and FLUXBOX preferences
-RUN mkdir ~/.fluxbox
-RUN echo "xset s off" > ~/.fluxbox/startup && echo "xserver-command=X -s 0 dpms" >> ~/.fluxbox/startup
-RUN echo "#!/bin/bash" > /etc/X11/xinit/xserverrc \
-  && echo "" >> /etc/X11/xinit/xserverrc \
-  && echo 'exec /usr/bin/X -s 0 dpms -nocursor -nolisten tcp "$@"' >> /etc/X11/xinit/xserverrc
-
-# Move package.json to filesystem
-COPY ./electron/package.json ./
-
-# Install npm modules for the application
-RUN JOBS=MAX npm install --unsafe-perm --production \
-	&& npm cache clean --force && node_modules/.bin/electron-rebuild
-
-# Move to app dir
-RUN mkdir /usr/app
-WORKDIR /usr/app
