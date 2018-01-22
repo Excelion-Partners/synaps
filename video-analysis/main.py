@@ -79,7 +79,7 @@ def main(sess,age,gender,train_mode,images_pl):
         rd = (now - last_read).total_seconds()
         if (rd > TIME_BETWEEN_READS):
             
-            t = time.time() # datetime.datetime.now()
+            t = time.time()
 
             last_read = arrow.now()
 
@@ -128,9 +128,10 @@ def main(sess,age,gender,train_mode,images_pl):
             biggest_img = 0
 
             fd_2 = 0
+            tmp = imutils.resize(img, width=320)
+
             for k, d in enumerate(detected):
 
-                tmp = imutils.resize(img, width=320)
                 shape = predictor(tmp, d)
 
                 fd = datetime.datetime.now()
@@ -198,7 +199,7 @@ def main(sess,age,gender,train_mode,images_pl):
                     socketIO.emit('frame', {"buffer": buff.decode(
                     'utf-8')})
             
-            t_2 = time.time()-t #float((datetime.datetime.now() - t).microseconds) / 1000000
+            t_2 = time.time()-t
 
             if fd_2 > 0:
                 Logger.log('total {0}s | detector {1}s | gender {2}s | descriptor {3}s '.format(t_2, d_2, g_2, fd_2))
