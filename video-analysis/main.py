@@ -141,7 +141,7 @@ def main(sess,age,gender,train_mode,images_pl):
             fd_2 = 0
             for k, d in enumerate(detected):
 
-                tmp = imutils.resize(gray, width=320)
+                tmp = imutils.resize(img, width=320)
                 shape = predictor(tmp, d)
 
                 fd = datetime.datetime.now()
