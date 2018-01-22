@@ -30,7 +30,7 @@ def draw_label(image, point, label, font=cv2.FONT_HERSHEY_SIMPLEX,
 def main(sess,age,gender,train_mode,images_pl):
     LOCAL_MODE = os.getenv('LOCAL_MODE', 'True') == 'True'
     TIME_BETWEEN_READS = float(os.getenv('TIME_BETWEEN_READS', .3))
-    TIME_BETWEEN_DEMO = float(os.getenv('TIME_BETWEEN_DEMO', 1))
+    TIME_BETWEEN_DEMO = float(os.getenv('TIME_BETWEEN_DEMO', .5))
     LIVE_VIDEO = True
     REMOVE_USER_TIMEOUT_SECONDS = int(
         os.getenv('REMOVE_USER_TIMEOUT_SECONDS', 60))  # seconds
@@ -78,6 +78,9 @@ def main(sess,age,gender,train_mode,images_pl):
 
         rd = (now - last_read).total_seconds()
         if (rd > TIME_BETWEEN_READS):
+            
+            t = datetime.datetime.now()
+
             last_read = arrow.now()
 
             ret, img = cap.read()
@@ -92,14 +95,10 @@ def main(sess,age,gender,train_mode,images_pl):
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             img_h, img_w, _ = np.shape(input_img)
 
-            t = datetime.datetime.now()
             # The 1 in the second argument indicates that we should upsample the image
             # 1 time.  This will make everything bigger and allow us to detect more
             # faces.
             detected = detector(gray, 0)
-            t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
-
-            Logger.log('detector took {}s'.format(t_2))
 
             people_in_last_frame = len(detected)
             faces = np.empty((len(detected), img_size, img_size, 3))
@@ -112,20 +111,21 @@ def main(sess,age,gender,train_mode,images_pl):
                 
                 # align the faces
                 for i, d in enumerate(detected):
-                    t = datetime.datetime.now()
+                    #t = datetime.datetime.now()
                     faces[i, :, :, :] = fa.align(input_img, gray, detected[i])
-                    t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
+                    #t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
                 
-                    Logger.log('aligner took {}s'.format(t_2))
+                    #Logger.log('aligner took {}s'.format(t_2))
                 
-                t = datetime.datetime.now()
+                #t = datetime.datetime.now()
                 ages,genders = sess.run([age, gender], feed_dict={images_pl: faces, train_mode: False})
-                t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
+                #t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
 
-                Logger.log('age,gender took {}s'.format(t_2))
+                #Logger.log('age,gender took {}s'.format(t_2))
 
-                Logger.log("{}".format(ld))
+                #Logger.log("{}".format(ld))
                 last_demo = arrow.now()
+                Logger.log('computed demographics')
 
             check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces)
 
@@ -139,11 +139,11 @@ def main(sess,age,gender,train_mode,images_pl):
             for k, d in enumerate(detected):
 
                 shape = predictor(img, d)
-                t = datetime.datetime.now()
+                #t = datetime.datetime.now()
                 face_descriptor = faceRecog.compute_face_descriptor(img, shape)
-                t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
+                #t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
 
-                Logger.log('face_descriptor took {}s'.format(t_2))
+               # Logger.log('face_descriptor took {}s'.format(t_2))
 
                 found = False
 
@@ -201,6 +201,10 @@ def main(sess,age,gender,train_mode,images_pl):
 
                     socketIO.emit('frame', {"buffer": buff.decode(
                     'utf-8')})
+            
+            t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
+
+            Logger.log('detector took {}s'.format(t_2))
 
 
 def check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces):
