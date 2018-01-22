@@ -138,6 +138,7 @@ def main(sess,age,gender,train_mode,images_pl):
             current_usr = ''
             biggest_img = 0
 
+            fd_2 = 0
             for k, d in enumerate(detected):
 
                 shape = predictor(img, d)
