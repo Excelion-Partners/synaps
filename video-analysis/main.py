@@ -92,32 +92,39 @@ def main(sess,age,gender,train_mode,images_pl):
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             img_h, img_w, _ = np.shape(input_img)
 
-            detected = detector(input_img, 1)
+            t = datetime.datetime.now()
+            detected = detector(gray, 1)
+            t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
+
+            Logger.log('detector took {}s'.format(t_2))
 
             people_in_last_frame = len(detected)
             faces = np.empty((len(detected), img_size, img_size, 3))
-
-            # align the faces
-            for i, d in enumerate(detected):
-                faces[i, :, :, :] = fa.align(input_img, gray, detected[i])
 
             # compute the ages / genders
             ld = (now - last_demo).total_seconds()
             ages = []
             genders = []
             if people_in_last_frame > 0 and ld > TIME_BETWEEN_DEMO:
+                
+                # align the faces
+                for i, d in enumerate(detected):
+                    t = datetime.datetime.now()
+                    faces[i, :, :, :] = fa.align(input_img, gray, detected[i])
+                    t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
+                
+                    Logger.log('aligner took {}s'.format(t_2))
+                
+                t = datetime.datetime.now()
                 ages,genders = sess.run([age, gender], feed_dict={images_pl: faces, train_mode: False})
+                t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
+
+                Logger.log('age,gender took {}s'.format(t_2))
+
                 Logger.log("{}".format(ld))
                 last_demo = arrow.now()
 
-            # iterate all the existing tracked_faces we know of and clean them up
-            for face in tracked_faces:
-                latest_session = face.mostRecentSession()
-                face.checkSessionTimeout()
-
-                if latest_session is not None:
-                    if (now - latest_session.lastSeen).total_seconds() >= REMOVE_USER_TIMEOUT_SECONDS:
-                        tracked_faces.remove(face)
+            check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces)
 
             if faces_tracked != len(tracked_faces):
                 Logger.log('{} tracked face'.format(len(tracked_faces)))
@@ -129,7 +136,11 @@ def main(sess,age,gender,train_mode,images_pl):
             for k, d in enumerate(detected):
 
                 shape = predictor(img, d)
+                t = datetime.datetime.now()
                 face_descriptor = faceRecog.compute_face_descriptor(img, shape)
+                t_2 = float((datetime.datetime.now() - t).microseconds) / 1000000
+
+                Logger.log('face_descriptor took {}s'.format(t_2))
 
                 found = False
 
@@ -187,6 +198,18 @@ def main(sess,age,gender,train_mode,images_pl):
 
                     socketIO.emit('frame', {"buffer": buff.decode(
                     'utf-8')})
+
+
+def check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces):
+    # iterate all the existing tracked_faces we know of and clean them up
+    for face in tracked_faces:
+        latest_session = face.mostRecentSession()
+        face.checkSessionTimeout()
+
+        if latest_session is not None:
+            if (now - latest_session.lastSeen).total_seconds() >= REMOVE_USER_TIMEOUT_SECONDS:
+                tracked_faces.remove(face)
+
 
 def load_network(model_path):
     sess = tf.Session()
