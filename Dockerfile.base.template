@@ -122,11 +122,10 @@ ENV PGLOG $PGHOME/log
 ENV POSTGRES /usr/lib/postgresql/9.6/bin/postgres
 ENV PGCTL /usr/lib/postgresql/9.6/bin/pg_ctl
 
-# postgres scripts
-RUN mkdir /usr/postgres
-COPY ./postgres/init.sql /usr/postgres/init.sql
-
 # postgres admin
 RUN apt-get update && apt-get install php5-pgsql phppgadmin
 COPY ./postgres/phppgadmin.conf /etc/apache2/conf-available/
 
+# postgres scripts
+RUN mkdir /usr/postgres
+COPY ./postgres/init.sql /usr/postgres/init.sql
