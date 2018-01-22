@@ -141,9 +141,11 @@ def main(sess,age,gender,train_mode,images_pl):
             fd_2 = 0
             for k, d in enumerate(detected):
 
-                shape = predictor(img, d)
+                tmp = imutils.resize(gray, width=320)
+                shape = predictor(tmp, d)
+
                 fd = datetime.datetime.now()
-                face_descriptor = faceRecog.compute_face_descriptor(img, shape)
+                face_descriptor = faceRecog.compute_face_descriptor(tmp, shape)
                 fd_2 = float((datetime.datetime.now() - fd).microseconds) / 1000000
 
                 found = False
