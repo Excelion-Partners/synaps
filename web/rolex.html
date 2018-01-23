@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Customizable Rolex Demo</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style type="text/css">
-        body, html {
+        body,
+        html {
             margin: 0;
             padding: 0;
             height: 100%;
@@ -23,18 +25,18 @@
             width: 100%;
             height: 100%;
             margin: 0;
-            border: none;        
+            border: none;
         }
-        
+
         .flip-horizontal {
             -moz-transform: scaleX(-1);
             -o-transform: scaleX(-1);
             -webkit-transform: scaleX(-1);
             transform: scaleX(-1);
             filter: FlipH;
-            -ms-filter: "FlipH";  
+            -ms-filter: "FlipH";
         }
-        
+
         #logo {
             margin: 10px;
             width: 100px;
@@ -64,72 +66,84 @@
 </head>
 
 <body>
-    <div id="claraContainer" class="flip-horizontal"></div>
-    
-    <div id="logo" class="flip-horizontal">
-        <img src="SynapsLogo.png"/>
-    </div>   
+    <div id="claraContainer"></div>
+
+    <div id="logo">
+        <img src="SynapsLogo.png" />
+    </div>
 
     <script>
         var uuid = "167f68a7-4ce5-4958-b8b5-0f0feab9e135";
         var container = $("#claraContainer");
         var clara = claraplayer("claraContainer");
-        ["orbit", "pan", "zoom", "vrMode", "home", "fullscreen"].map(function (tool) { return clara.player.hideTool(tool) });
+        clara.on('loaded', function () {
+            console.log('Clara player is loaded and ready');
+        });
+        // ["orbit", "pan", "zoom", "vrMode", "home", "fullscreen"].map(function (tool) { return clara.player.hideTool(tool) });
 
         clara.on("rendered", function () {
             console.log("Clara player is rendered.");
-            
+
             var intMaterialFbPath = "rolex/intMaterial";
             var intMaterialFb = firebase.database().ref(intMaterialFbPath);
             intMaterialFb.on("value", function (snapshot) {
                 var data = snapshot.val();
-                console.log("Firebase variable '" + intMaterialFbPath + "' value updated: '" + JSON.stringify(data) + "'.");
+                console.log("Firebase variable '" + intMaterialFbPath + "' value updated: '" + JSON.stringify(
+                    data) + "'.");
                 if (data && data.toLowerCase() === "gold") {
-                    setMaterial(linksInteriorName, materialGoldUuid);  
+                    setMaterial(linksInteriorName, materialGoldUuid);
                 } else {
                     // Default to silver
-                    setMaterial(linksInteriorName, materialSilverUuid);  
+                    setMaterial(linksInteriorName, materialSilverUuid);
                 }
             });
-    
+
             var extMaterialFbPath = "rolex/extMaterial";
             var extMaterialFb = firebase.database().ref(extMaterialFbPath);
             extMaterialFb.on("value", function (snapshot) {
                 var data = snapshot.val();
-                console.log("Firebase variable '" + extMaterialFbPath + "' value updated: '" + JSON.stringify(data) + "'.");
+                console.log("Firebase variable '" + extMaterialFbPath + "' value updated: '" + JSON.stringify(
+                    data) + "'.");
                 if (data && data.toLowerCase() === "gold") {
-                    setMaterial(linksExteriorName, materialGoldUuid);  
+                    setMaterial(linksExteriorName, materialGoldUuid);
                 } else {
                     // Default to silver
-                    setMaterial(linksExteriorName, materialSilverUuid);  
+                    setMaterial(linksExteriorName, materialSilverUuid);
                 }
             });
         });
 
-        clara.sceneIO.fetchAndUse(uuid, undefined, { waitForPublish: true }).then(function () {
-            console.log("Scene ", uuid, " has been loaded.");
-        }).catch(function(err) {
+        clara.sceneIO.fetchAndUse(uuid, undefined, {
+            waitForPublish: true
+        }).then(function () {
+           // clara.api.commands.activateCommand('orbit')
+            console.log("Scene " + uuid + " has been loaded.");
+        }).catch(function (err) {
             console.log("There was an error fetching: ", uuid);
             console.log(err);
         });
-        
+
         var linksExteriorName = "StrapLinks_Exterior";
         var linksInteriorName = "StrapLinks_Interior";
         var materialSilverUuid = "057d3478-eeb6-4ff7-9257-727f6c06a353";
         var materialGoldUuid = "5dcb9b49-847b-4555-933a-6d62865d46a8";
-        
+
         function setMaterial(objName, materialId) {
             var obj = clara.scene.find(objName + "#Material[name=Reference]");
-            clara.scene.set(obj, {"reference": materialId });
+            clara.scene.set(obj, {
+                "reference": materialId
+            });
         }
-        
+
         var logoFbPath = "rolex/displayLogo";
         var logoFb = firebase.database().ref(logoFbPath);
         logoFb.on("value", function (snapshot) {
             var displayLogo = snapshot.val();
-            console.log("Firebase variable '" + logoFbPath + "' value updated: '" + JSON.stringify(displayLogo) + "'.");
+            console.log("Firebase variable '" + logoFbPath + "' value updated: '" + JSON.stringify(displayLogo) +
+                "'.");
             displayLogo ? $("#logo").show() : $("#logo").hide();
         });
     </script>
 </body>
+
 </html>
