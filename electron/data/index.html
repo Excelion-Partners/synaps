@@ -1,159 +1,152 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <title>Synaps</title>
+    <title>Customizable Rolex Demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style type="text/css">
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background-color: black;
+            font-size: 100%;
+        }
 
-  <style type="text/css">
-    html,
-    body {
-      height: 100%;
-      margin: 0px;
-      padding: 0px;
-      background-color: black;
-      overflow: hidden;
-    }
+        #claraContainer {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            border: none;
+        }
 
-    #display-div {
-      height: 100%;
-      transition: background-image 1s ease-in-out;
-      background-size: contain;
-      background-repeat: no-repeat;
-      color: white;
-      font-size: 100px;
-    }
+        .flip-horizontal {
+            -moz-transform: scaleX(-1);
+            -o-transform: scaleX(-1);
+            -webkit-transform: scaleX(-1);
+            transform: scaleX(-1);
+            filter: FlipH;
+            -ms-filter: "FlipH";
+        }
 
-    #user-ct {
-      float: right;
-      font-size: 30px;
-      color: white;
-      padding: 15px;
-    }
+        #logo {
+            margin: 10px;
+            width: 100px;
+            position: fixed;
+            bottom: 0;
+            right: 0;
+        }
+    </style>
 
-    iframe {
-      position: fixed;
-      right: 0;
-      bottom: 0;
-      min-width: 100%;
-      min-height: 100%;
-      width: auto;
-      height: auto;
-      /* z-index: -100; */
-    }
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script> -->
+    <script src="https://clara.io/js/claraplayer.min.js"></script>
 
-  </style>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
-  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-tubeplayer/2.1.0/jquery.tubeplayer.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
-
-  <script>
-    $(document).ready(function () {
-      // $('#display-div').css('background-image', 'url(http://www.art-dept.net/wp-content/uploads/2013/03/blue_label.jpg)');
-      var _socket;
-      var _ads;
-      var _deviceId;
-      var _adSetId;
-
-      var fb = firebase.initializeApp({
-        databaseURL: "https://synaps-demo.firebaseio.com/", // Realtime Database
-      });
-
-      fb.database().ref('ads').on('value', function (dataSnapshot) {
-        _ads = dataSnapshot.val();
-      });
-
-
-      var index = 0;
-
-      function init() {
-        var src = 'http://localhost:3003/';
-        _socket = io(src);
-        _socket.on('connect', function () {
-          console.log('connected');
-
-          _socket.on('media-change', function (data) {
-            // changeMedia(data);
-            if (data.userct != null) {
-              $('#user-ct').html(data.userct);
-            }
-          });
-
-          _socket.emit('config', {}, function (data) {
-            _deviceId = data['device-id'];
-            //_adSetId = parseInt(data['ad-set-id']);
-            fb.database().ref('devices/' + _deviceId + 'AD_SET_ID').on('value', function(data){
-              _adSetId = data.val();
-            });
-          });
-
-        });
-
-        _socket.on('disconnect', function () {});
-      }
-
-      var chInt = setInterval(function () {
-        if (_adSetId == null)
-          return;
-
-        var ad = _ads[_adSetId].set[index];
-        _socket.emit('ad-change', {
-          url: ad.image == null ? ad.video : ad.image
-        });
-
-        changeMedia(ad.image, ad.video);
-
-        index++;
-        if (index >= _ads[_adSetId].set.length)
-          index = 0;
-
-        if (ad.video != null)
-          clearInterval(chInt);
-      }, 8000);
-
-      init();
-    })
-
-    function changeMedia(image, video) {
-      if (image != null) {
-        $('#vid-div').hide();
-        //  $('#display-div').show();
-        $('#display-div').css('background-image', 'url(' + image + ')');
-      } else {
-        //$('#vid-div').show();
-        $('#display-div').hide();
-        // youtube
-        $('#vid-frame').prop('src', 'https://www.youtube.com/embed/' + video + '?controls=0&autoplay=1&loop=1&playlist=' + video);
-        // $('#vid-div').tubeplayer({
-        //   initialVideo: video,
-        //   controls: 0,
-        //   loop: 1000,/
-        //   modestbranding: false,
-        //   autoPlay: 1,
-        //   //width: $(document).width(),
-        //   //height: $(document).height(),
-        //   // onPlayerLoaded: function(){
-        //   //   alert("that was awesome!"); 
-        //   //   },
-        //   // onPlayerPlaying: function(){console.log("PLAYING")},
-        //   // onPlayerEnded: function () {
-        //   //   console.log('END')
-        //   //   $('#vid-div').tubeplayer("play");
-        //   // }
-        // });
-      }
-    }
-
-  </script>
+    <!--Firebase initialization-->
+    <script src="https://www.gstatic.com/firebasejs/4.6.1/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyBB-xkCwhxv_dwPsU5KrETBVn5EgkT6qAE",
+            authDomain: "artco-demo.firebaseapp.com",
+            databaseURL: "https://artco-demo.firebaseio.com",
+            projectId: "artco-demo",
+            storageBucket: "artco-demo.appspot.com",
+            messagingSenderId: "418060779748"
+        };
+        firebase.initializeApp(config);
+    </script>
 </head>
 
 <body>
-  <iframe id="vid-frame" width="420" height="315" frameborder="0" allowfullscreen></iframe>
-  <div id="display-div">
-    <div id="user-ct"></div>
-  </div>
+    <div id="claraContainer"></div>
+
+    <div id="logo">
+        <img src="SynapsLogo.png" />
+    </div>
+
+    <script>
+        var uuid = "167f68a7-4ce5-4958-b8b5-0f0feab9e135";
+        //var container = $("#claraContainer");
+        var clara = claraplayer("claraContainer");
+        clara.on('loaded', function () {
+            console.log('Clara player is loaded and ready');
+        });
+        clara.on('threeinitialized',function() {
+            console.log('threeinitialized');
+        })
+        // ["orbit", "pan", "zoom", "vrMode", "home", "fullscreen"].map(function (tool) { return clara.player.hideTool(tool) });
+
+        clara.on("rendered", function () {
+            console.log("Clara player is rendered.");
+
+            var intMaterialFbPath = "rolex/intMaterial";
+            var intMaterialFb = firebase.database().ref(intMaterialFbPath);
+            intMaterialFb.on("value", function (snapshot) {
+                var data = snapshot.val();
+                console.log("Firebase variable '" + intMaterialFbPath + "' value updated: '" + JSON.stringify(
+                    data) + "'.");
+                if (data && data.toLowerCase() === "gold") {
+                    setMaterial(linksInteriorName, materialGoldUuid);
+                } else {
+                    // Default to silver
+                    setMaterial(linksInteriorName, materialSilverUuid);
+                }
+            });
+
+            var extMaterialFbPath = "rolex/extMaterial";
+            var extMaterialFb = firebase.database().ref(extMaterialFbPath);
+            extMaterialFb.on("value", function (snapshot) {
+                var data = snapshot.val();
+                console.log("Firebase variable '" + extMaterialFbPath + "' value updated: '" + JSON.stringify(
+                    data) + "'.");
+                if (data && data.toLowerCase() === "gold") {
+                    setMaterial(linksExteriorName, materialGoldUuid);
+                } else {
+                    // Default to silver
+                    setMaterial(linksExteriorName, materialSilverUuid);
+                }
+            });
+        });
+
+        clara.sceneIO.fetchAndUse(uuid, undefined, {
+            waitForPublish: true
+        }).then(function () {
+           // clara.api.commands.activateCommand('orbit')
+            console.log("Scene " + uuid + " has been loaded.");
+        }).catch(function (err) {
+            console.log("There was an error fetching: ", uuid);
+            console.log(err);
+        });
+
+        var linksExteriorName = "StrapLinks_Exterior";
+        var linksInteriorName = "StrapLinks_Interior";
+        var materialSilverUuid = "057d3478-eeb6-4ff7-9257-727f6c06a353";
+        var materialGoldUuid = "5dcb9b49-847b-4555-933a-6d62865d46a8";
+
+        function setMaterial(objName, materialId) {
+            var obj = clara.scene.find(objName + "#Material[name=Reference]");
+            clara.scene.set(obj, {
+                "reference": materialId
+            });
+        }
+
+        var logoFbPath = "rolex/displayLogo";
+        var logoFb = firebase.database().ref(logoFbPath);
+        // logoFb.on("value", function (snapshot) {
+        //     var displayLogo = snapshot.val();
+        //     console.log("Firebase variable '" + logoFbPath + "' value updated: '" + JSON.stringify(displayLogo) +
+        //         "'.");
+        //     displayLogo ? $("#logo").show() : $("#logo").hide();
+        // });
+    </script>
 </body>
 
 </html>
