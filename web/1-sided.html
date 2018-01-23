@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Synaps Demo | Client</title>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+      
+    <style type="text/css">
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        #videoIframeCenter {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            border: none;
+        }
+        
+        .flip-horizontal {
+            -moz-transform: scaleX(-1);
+            -o-transform: scaleX(-1);
+            -webkit-transform: scaleX(-1);
+            transform: scaleX(-1);
+            filter: FlipH;
+            -ms-filter: "FlipH";  
+        }
+        
+        #logo {
+            margin: 10px;
+            width: 100px;
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            display: none;
+        }
+        
+        #jackDanielsInfo {
+            margin: 10px;
+            position: fixed;
+            top: 250px;
+            right: 75px;
+            font-size: 1.5em;
+            width: 400px;
+            background-color: black;
+            color: white;
+            display: none; 
+        }
+        
+        #jackRecipes {
+            margin: 10px;
+            position: fixed;
+            top: 300px;
+            left: 75px;
+            font-size: 1.25em;
+            width: 400px;
+            height: 400px;
+            background-color: black;
+            display: none; 
+        }
+        
+        .carousel.fade {
+            opacity: 1;
+        }
+        
+        .carousel.fade .item {
+            transition: opacity ease-out .7s;
+            left: 0;
+            opacity: 0; /* hide all slides */
+            top: 0;
+            position: absolute;
+            width: 100%;
+            display: block;
+        }
+        
+        .carousel.fade .item:first-child {
+            top: auto;
+            opacity: 1; /* show first slide */
+            position: relative;
+        }
+        
+        .carousel.fade .item.active {
+            opacity: 1;
+        } 
+    </style>
+    
+    <!--Firebase initialization-->
+    <script src="https://www.gstatic.com/firebasejs/4.6.1/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyBB-xkCwhxv_dwPsU5KrETBVn5EgkT6qAE",
+            authDomain: "artco-demo.firebaseapp.com",
+            databaseURL: "https://artco-demo.firebaseio.com",
+            projectId: "artco-demo",
+            storageBucket: "artco-demo.appspot.com",
+            messagingSenderId: "418060779748"
+        };
+        firebase.initializeApp(config);
+    </script>
+</head>
+<body>
+    <div class="">
+        <iframe id="videoIframeCenter" class="videoPlayer" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
+    </div>
+    
+    <div id="logo" class="flip-horizontal">
+        <img src="SynapsLogo.png"/>
+    </div>
+    
+    <div id="jackDanielsInfo" class="flip-horizontal">
+      <h2 style="font-family: acumin-pro-extra-condensed,Sans-Serif;">
+          CHARCOAL MELLOWED. DROP BY DROP.
+      </h2>
+      <p>
+          Mellowed drop by drop through 10-feet of sugar maple charcoal, then matured in handcrafted barrels of our own making. And our Tennessee Whiskey doesn’t follow a calendar. It’s only ready when our tasters say it is. We judge it by the way it looks. By its aroma. And of course, by the way it tastes. It’s how Jack Daniel himself did it over a century ago. And how we still do it today.
+      </p>
+      <h3>
+          $14.99 ea
+      </h3>
+    </div>
+    
+    <div id="jackRecipes">
+        <div id="myCarousel" class="carousel fade" data-ride="carousel">     
+          <div class="carousel-inner" role="listbox">
+            <div class="item active">
+              <img style="height: 400px; width: 400px;" src="Recipe1.jpg" alt="Recipe1">
+            </div>
+        
+            <div class="item">
+              <img style="height: 400px; width: 400px;" src="Recipe2.jpg" alt="Recipe2">
+            </div>
+        
+            <div class="item">
+              <img style="height: 400px; width: 400px;" src="Recipe3.jpg" alt="Recipe3">
+            </div>
+          </div>
+        </div>
+    </div>
+              
+    <script>
+        var href = window.location.href;
+        var sidesQsParamLoc = href.indexOf("sides=");
+        var defaultNumOfSides = 1;
+        var sides = sidesQsParamLoc === -1 ? defaultNumOfSides : href.substring(sidesQsParamLoc + 6, sidesQsParamLoc + 7) * 1;
+        console.log("Set to " + sides + " sides.");
+
+        var currentVideoFbPath;
+        if (sides === 1) {
+            currentVideoFbPath = "currentVideo";
+        } else {
+            currentVideoFbPath = "currentThreeSidedVideo";
+        }
+
+        // For more information on configuring the YouTube player, see https://developers.google.com/youtube/player_parameters?playerVersion=HTML5.
+        var youTubeVideoUrlTemplate = "https://www.youtube.com/embed/{0}?version=3&amp;rel=0&amp;autoplay=1&amp;controls=0&amp;showinfo=0&amp;rel=0&amp;loop=1&amp;playlist={0}&amp;modestbranding=1";
+        function updateCurrentVideo(videoId) {
+            var videoUrl = youTubeVideoUrlTemplate.replace(/\{0\}/g, videoId);
+            var player = document.getElementById("videoIframeCenter");
+            player.setAttribute("src", videoUrl);
+            console.log("Updated video URL.");
+        }
+
+        var currentVideoFirebaseRef = firebase.database().ref(currentVideoFbPath);
+        currentVideoFirebaseRef.on("value", function (snapshot) {
+            var videoData = snapshot.val() || { "videoId": null };
+
+            console.log("Firebase variable '" + currentVideoFbPath + "' value updated: '" + JSON.stringify(videoData) + "'.");
+            updateCurrentVideo(videoData.videoId);
+
+            var isJacks = videoData.videoId === jackDanielsVideoData.videoId;            
+            if (isJacks) {
+                $("#jackDanielsInfo").fadeIn(1000);
+                $("#jackRecipes").fadeIn(1000);
+                $("#logo").fadeIn(1000);
+            } else {
+                $("#jackDanielsInfo").fadeOut(1000);
+                $("#jackRecipes").fadeOut(1000); 
+                $("#logo").fadeOut(1000);
+            }
+        });
+        
+        var expectedUpc = "082184090466";
+        var keyBuffer = "";
+        var upcEntered = false;
+        
+        $(document).keypress(function(e) {
+            // check for an ENTER key code.  Enter will serve as our trigger to indicate end of text stream.
+            if (e.which === 13) {
+                // check if entered string matches expected UPC
+                if (keyBuffer === expectedUpc) {
+                    // if yes, set firebase variable
+                    setVideoToJackDaniels();
+                } 
+                
+                // Clear keyBuffer
+                keyBuffer = "";
+            } else {
+                // convert key code to string and add to buffer
+                keyBuffer += String.fromCharCode(e.which);
+            }
+        });
+        
+        var jackDanielsVideoData = {
+            "videoId": "SwSCp3fNhNc",
+            "name": "Jack Daniels"
+        };
+          
+        function setVideoToJackDaniels() {
+            var currentVideoFbPath = "currentVideo";
+            console.log("Setting '" + currentVideoFbPath + "' field in Firebase to '" + JSON.stringify(jackDanielsVideoData) + "'.");
+            firebase.database().ref(currentVideoFbPath).set(jackDanielsVideoData);
+            console.log("Set '" + currentVideoFbPath + "' value in Firebase.");
+        }        
+    </script>
+</body>
+</html>
