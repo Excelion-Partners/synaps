@@ -46,7 +46,7 @@
         }
     </style>
 
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script> -->
     <script src="https://clara.io/js/claraplayer.min.js"></script>
 
     <!--Firebase initialization-->
@@ -74,7 +74,7 @@
 
     <script>
         var uuid = "167f68a7-4ce5-4958-b8b5-0f0feab9e135";
-        var container = $("#claraContainer");
+        //var container = $("#claraContainer");
         var clara = claraplayer("claraContainer");
         clara.on('loaded', function () {
             console.log('Clara player is loaded and ready');
@@ -140,12 +140,12 @@
 
         var logoFbPath = "rolex/displayLogo";
         var logoFb = firebase.database().ref(logoFbPath);
-        logoFb.on("value", function (snapshot) {
-            var displayLogo = snapshot.val();
-            console.log("Firebase variable '" + logoFbPath + "' value updated: '" + JSON.stringify(displayLogo) +
-                "'.");
-            displayLogo ? $("#logo").show() : $("#logo").hide();
-        });
+        // logoFb.on("value", function (snapshot) {
+        //     var displayLogo = snapshot.val();
+        //     console.log("Firebase variable '" + logoFbPath + "' value updated: '" + JSON.stringify(displayLogo) +
+        //         "'.");
+        //     displayLogo ? $("#logo").show() : $("#logo").hide();
+        // });
     </script>
 </body>
 
