@@ -3,6 +3,12 @@ const path = require('path');
 
 const { app, BrowserWindow } = electron;
 
+app.commandLine.appendSwitch('ignore-gpu-blacklist', 'true')
+app.commandLine.appendSwitch('enable-gpu-rasterization', 'true')
+app.commandLine.appendSwitch('enable-zero-copy', 'true')
+app.commandLine.appendSwitch('disable-software-rasterizer', 'true')
+app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', 'true')
+
 // simple parameters initialization
 const electronConfig = {
   URL_LAUNCHER_TOUCH: process.env.URL_LAUNCHER_TOUCH === '1' ? 1 : 0,
@@ -54,6 +60,7 @@ app.on('ready', () => {
       nodeIntegration: !!(electronConfig.URL_LAUNCHER_NODE),
       zoomFactor: electronConfig.URL_LAUNCHER_ZOOM,
       overlayScrollbars: !!(electronConfig.URL_LAUNCHER_OVERLAY_SCROLLBARS),
+      webgl: true
     },
   });
 
