@@ -11,7 +11,7 @@ from logger import Logger
 
 class Storage:
     
-    def __init__(self, descriptor):
+    def __init__(self):
         self.conn_str = "dbname=synaps user=synaps password=3wPUBimpTH6Y"
 
     def get_changes(self):
