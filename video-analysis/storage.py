@@ -12,7 +12,7 @@ from logger import Logger
 class Storage:
     
     def __init__(self):
-        self.conn_str = "dbname=synaps user=synaps password=3wPUBimpTH6Y"
+        self.conn_str = "dbname='synaps' user='synaps' password='3wPUBimpTH6Y' host='localhost'"
 
     def get_changes(self):
         conn = psycopg2.connect(self.conn_str)

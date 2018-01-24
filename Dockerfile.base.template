@@ -60,6 +60,33 @@ RUN apt-get install \
 	python3-scipy \
 	&& rm -rf /var/lib/apt/lists/
 
+# video drivers from https://forums.resin.io/t/intel-nuc-skylake-kabylake-video-issues/1497/13
+RUN echo deb http://http.debian.net/debian jessie-backports main contrib non-free > /etc/apt/sources.list.d/jessie-backports.list
+RUN apt-get update
+RUN sudo apt-get install --target-release jessie-backports \
+  linux-image-amd64 \
+  firmware-misc-nonfree \
+  xserver-xorg-video-intel \
+  libegl1-mesa \
+  libgl1-mesa-glx \
+  libgl1-mesa-dri \
+  libegl1-mesa \
+  libegl1-mesa-drivers \
+  libgl1-mesa-dri \
+  libgl1-mesa-glx \
+  libglapi-mesa \
+  libgles1-mesa \
+  libgles2-mesa \
+  libglu1-mesa \
+  libopenvg1-mesa \
+  libtxc-dxtn-s2tc0 \
+  mesa-utils \
+  mesa-utils-extra \
+  libva-drm1 \
+  libgl1-mesa-dev \
+  libglu1-mesa-dev \
+  freeglut3-dev
+
 # python installs
 RUN pip install subprocess32
 RUN pip install python-systemd-dbus
@@ -117,16 +144,6 @@ RUN sudo mkdir -p /usr/share/man/man7/
 RUN sudo touch /usr/share/man/man7/WITH.7.gz.dpkg-tmp
 RUN sudo apt-get install postgresql-client-9.6 -t jessie-backports
 RUN sudo apt-get install postgresql-9.6 -t jessie-backports
-
-# Set up environment for postgres install and startup.
-ENV PG_VERSION 9.6
-ENV PGUSER synaps
-ENV PGPASS 3wPUBimpTH6Y
-ENV PGHOME /data/postgresql
-ENV PGDATA $PGHOME/data
-ENV PGLOG $PGHOME/log
-ENV POSTGRES /usr/lib/postgresql/9.6/bin/postgres
-ENV PGCTL /usr/lib/postgresql/9.6/bin/pg_ctl
 
 # postgres admin
 RUN apt-get update && apt-get install php5-pgsql phppgadmin

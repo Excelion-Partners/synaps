@@ -204,6 +204,20 @@ def main(sess,age,gender,train_mode,images_pl):
             if fd_2 > 0:
                 Logger.log('total {0}s | detector {1}s | gender {2}s | descriptor {3}s '.format(t_2, d_2, g_2, fd_2))
 
+              n_sync = '{}_{}'.format(now.minute, now.second)
+
+            if n_sync != ms_sync:
+                ms_sync = n_sync
+                unsyncd = storage.getUnsyncedSessions()
+
+                if len(unsyncd) > 0:
+                    Logger.log("syncing")
+
+                    r = start_new_thread(iot.updateSessions, (unsyncd,))
+
+                    if r is not False:
+                        storage.updateSessionSyncStatus(unsyncd)
+
 def check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces):
     # iterate all the existing tracked_faces we know of and clean them up
     for face in tracked_faces:

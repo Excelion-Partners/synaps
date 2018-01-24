@@ -1,0 +1,12 @@
+dependencies:
+  pre:
+    - npm install -g better-npm-run
+    - npm install
+test:
+  override:
+    - npm test
+deployment:
+  dev:
+    branch: develop
+    commands:
+      - bnr deploy:ci

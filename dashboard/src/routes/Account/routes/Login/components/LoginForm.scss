@@ -1,0 +1,13 @@
+.login-form {
+  padding-bottom:50px;
+}
+
+.login-form>input {
+  margin-bottom: 10px !important;
+}
+
+@media (max-width: 767px){
+  .login-form {
+    padding-left: 50px;
+  }
+}
