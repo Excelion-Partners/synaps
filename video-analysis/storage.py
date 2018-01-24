@@ -42,6 +42,7 @@ class Storage:
 
             conn.commit()
             cur.close()
+            Logger.log('inserted session')
         except(Exception, psycopg2.DatabaseError) as error:
             Logger.log(error)
         finally:

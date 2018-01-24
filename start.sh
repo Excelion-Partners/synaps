@@ -6,6 +6,20 @@ export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 systemctl stop hostapd
 systemctl stop dnsmasq
 
+# grafana
+GRAFANA_DIR="/data/grafana"
+if [ ! -d "$GRAFANA_DIR" ];
+then
+    mkdir $GRAFANA_DIR
+fi
+
+chmod -R 777 /data/grafana
+
+/bin/systemctl daemon-reload
+/bin/systemctl enable grafana-server
+service grafana-server start
+
+# network connect
 python /usr/pyNetworkConnect/python/main.py
 
 # postgres

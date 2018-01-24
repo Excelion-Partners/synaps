@@ -1,10 +1,5 @@
 FROM rmoorexcelion/synaps-base:latest
 
-RUN apt update
-RUN apt search openblas
-RUN apt install libopenblas-dev
-RUN update-alternatives --config libblas.so.3
-
 # Move to app dir
 WORKDIR /usr/app
 

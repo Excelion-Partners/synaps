@@ -98,6 +98,12 @@ RUN pip3 install boto3
 RUN pip3 install socketIO-client
 RUN pip3 install --upgrade "https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.4.1-cp34-cp34m-linux_x86_64.whl"
 
+# openblas (needed for fast dlib)
+RUN apt update
+RUN apt search openblas
+RUN apt install libopenblas-dev
+RUN update-alternatives --config libblas.so.3
+ 
 # Install Postgres 9.6
 RUN pip install psycopg2
 
@@ -129,3 +135,11 @@ COPY ./postgres/phppgadmin.conf /etc/apache2/conf-available/
 # postgres scripts
 RUN mkdir /usr/postgres
 COPY ./postgres/init.sql /usr/postgres/init.sql
+
+# grafana
+WORKDIR /usr/
+
+RUN wget https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana_4.6.3_amd64.deb
+RUN apt-get install -y adduser libfontconfig
+RUN dpkg -i grafana_4.6.3_amd64.deb
+COPY ./grafana/grafana.ini /etc/grafana/grafana.ini

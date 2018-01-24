@@ -7,6 +7,7 @@ import boto3
 
 from face_session import FaceSession
 from logger import Logger
+from storage import Storage
 
 USER_SESSION_TIMEOUT_SECONDS = 6
 MIN_SESSION_LENGTH = 2
@@ -19,6 +20,7 @@ class Face:
         self.descriptor = descriptor
         self.sessions = []
 
+        self.storage = Storage()
         self.age_tot = 0
         self.age_ct = 0
         self.sex_tot = 0
@@ -91,6 +93,7 @@ class Face:
             self.sessions.remove(ses)
             Logger.log("Killed a user session because it was too short")
         else:
+            self.storage.insert_session(self, self.currentSession())
             self.currentSession().complete = True
 
     def appendNewSession(self):
