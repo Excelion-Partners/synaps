@@ -19,6 +19,7 @@ from imutils.face_utils import FaceAligner
 from logger import Logger
 from face_session import FaceSession
 from face import Face
+from storage import Storage
 
 def draw_label(image, point, label, font=cv2.FONT_HERSHEY_SIMPLEX,
                font_scale=1, thickness=2):
@@ -38,9 +39,11 @@ def main(sess,age,gender,train_mode,images_pl):
 
     Logger.log('running in Local mode: {}'.format(LOCAL_MODE))
 
-    if not LOCAL_MODE:
-        socketIO = SocketIO('localhost', 3003, LoggingNamespace)
-        Logger.log("Connected to socket.io")
+    # if not LOCAL_MODE:
+    socketIO = SocketIO('localhost', 3001, LoggingNamespace)
+    Logger.log("Connected to socket.io")
+
+    Logger.log("LIVE_VIDEO: {}".format(LIVE_VIDEO))
 
     camera_port = 0
     if not LOCAL_MODE:
@@ -191,32 +194,34 @@ def main(sess,age,gender,train_mode,images_pl):
 
             if LOCAL_MODE:
                 win.set_image(img)
-            else:
-                if LIVE_VIDEO:
-                    encImg = cv2.imencode('.png', img[:])
-                    buff = base64.b64encode(encImg[1])
+            if LIVE_VIDEO:
+                frame4 = imutils.resize(img, width=360)
+                #frame4 = cv2.flip(frame4, 1)
 
-                    socketIO.emit('frame', {"buffer": buff.decode(
-                    'utf-8')})
+                encImg = cv2.imencode('.png', frame4[:])
+                buff = base64.b64encode(encImg[1])
+
+                socketIO.emit('frame', {"buffer": buff.decode(
+                'utf-8')})
             
-            t_2 = time.time()-t
-
-            if fd_2 > 0:
-                Logger.log('total {0}s | detector {1}s | gender {2}s | descriptor {3}s '.format(t_2, d_2, g_2, fd_2))
-
-              n_sync = '{}_{}'.format(now.minute, now.second)
-
-            if n_sync != ms_sync:
-                ms_sync = n_sync
-                unsyncd = storage.getUnsyncedSessions()
-
-                if len(unsyncd) > 0:
-                    Logger.log("syncing")
-
-                    r = start_new_thread(iot.updateSessions, (unsyncd,))
-
-                    if r is not False:
-                        storage.updateSessionSyncStatus(unsyncd)
+            # t_2 = time.time()-t
+            #
+            # if fd_2 > 0:
+            #     Logger.log('total {0}s | detector {1}s | gender {2}s | descriptor {3}s '.format(t_2, d_2, g_2, fd_2))
+            #
+            #   n_sync = '{}_{}'.format(now.minute, now.second)
+            #
+            # if n_sync != ms_sync:
+            #     ms_sync = n_sync
+            #     unsyncd = storage.getUnsyncedSessions()
+            #
+            #     if len(unsyncd) > 0:
+            #         Logger.log("syncing")
+            #
+            #         r = start_new_thread(iot.updateSessions, (unsyncd,))
+            #
+            #         if r is not False:
+            #             storage.updateSessionSyncStatus(unsyncd)
 
 def check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces):
     # iterate all the existing tracked_faces we know of and clean them up

@@ -73,7 +73,7 @@ app.all('*', function (req, res, next) {
 })
 
 var server = http.createServer(app)
-var port = 3003 // app.get('port')
+var port = 3001 // app.get('port')
 server.listen(port, function () {
     console.log('SOCKETIO server listening on port ' + port)
 })
@@ -90,6 +90,7 @@ io.on('connection', function (socket) {
 
     _socket.on('frame', function (frame) {
         _socket.broadcast.emit('frame', frame);
+       // console.log('new frame')
     });
 })
 

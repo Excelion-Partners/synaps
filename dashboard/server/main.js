@@ -76,18 +76,18 @@ if (project.env === 'development' || project.env === 'cloud9') {
 }
 
 // WebSocket server
-var server = http.createServer(app)
-var port = 3001 // app.get('port')
-server.listen(port, function () {
-	console.log('SOCKETIO server listening on port ' + port)
-})
+// var server = http.createServer(app)
+// var port = 3001 // app.get('port')
+// server.listen(port, function () {
+// 	console.log('SOCKETIO server listening on port ' + port)
+// })
 
-var io = require('socket.io')(server)
-console.log('starting socket')
-io.on('connection', function (socket) {
-	socket.on('frame', function (frame) {
-		socket.broadcast.emit('frame', frame)
-	})
-})
+// var io = require('socket.io')(server)
+// console.log('starting socket')
+// io.on('connection', function (socket) {
+// 	socket.on('frame', function (frame) {
+// 		socket.broadcast.emit('frame', frame)
+// 	})
+// })
 
 module.exports = app

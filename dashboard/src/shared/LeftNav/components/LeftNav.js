@@ -14,7 +14,7 @@ export const LeftNav = () => {
 					</li>
 					<li>
 						<a href='#monitoring' data-toggle='collapse' aria-expanded='false'>
-							Cameras<span className='sub-nav-icon'> <i className='stroke-arrow' /> </span>
+							Locations<span className='sub-nav-icon'> <i className='stroke-arrow' /> </span>
 						</a>
 					</li>
 					<li>

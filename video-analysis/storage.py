@@ -12,7 +12,8 @@ from logger import Logger
 class Storage:
     
     def __init__(self):
-        self.conn_str = "dbname='synaps' user='synaps' password='3wPUBimpTH6Y' host='localhost'"
+        # self.conn_str = "dbname='synaps' user='synaps' password='3wPUBimpTH6Y' host='localhost'"
+        self.conn_str = "dbname='redpanda' user='sa' password='redpanda' host='redpanda-dev.cd7qb5oqj1aq.us-east-1.rds.amazonaws.com'"
 
     def get_changes(self):
         conn = psycopg2.connect(self.conn_str)
@@ -36,9 +37,14 @@ class Storage:
             conn = psycopg2.connect(self.conn_str)
             cur = conn.cursor()
 
-            sql = """INSERT INTO sessions(start_date, duration, age, sex) values (%s, %s, %s, %s);"""
+            # sql = """INSERT INTO sessions(start_date, duration, age, sex) values (%s, %s, %s, %s);"""
+            sql = """INSERT INTO sessions (start_time, end_time, age_low, age_high, male) VALUES (%s, %s, %s, %s, %s)"""
 
-            cur.execute(sql, (session.session_start(), session.session_length(), face.age(), face.sex()))
+            sx = 'false'
+            if face.sex() == 'Male':
+                sx = 'true'
+
+            cur.execute(sql, (session.firstSeen.datetime, session.lastSeen.datetime, face.age(), face.age(), sx))
 
             conn.commit()
             cur.close()

@@ -47,6 +47,13 @@ WORKDIR /usr/app/socket
 RUN JOBS=MAX npm install --unsafe-perm --production \
 	&& npm cache clean --force 
 
+# dashboard
+RUN mkdir /usr/app/dashboard
+WORKDIR /usr/app/dashboard
+COPY ./dashboard/package.json ./
+RUN JOBS=MAX npm install --unsafe-perm --production
+COPY ./dashboard ./
+
 # web
 COPY ./web /var/www/html
 
