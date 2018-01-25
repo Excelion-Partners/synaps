@@ -37,9 +37,10 @@ umount /dev/shm && mount -t tmpfs shm /dev/shm
 rm /tmp/.X0-lock &>/dev/null || true
 
 # dashboard
+Cannot find module './source-map/source-map-generator'
 cd /usr/app/dashboard/ && npm run compile
 
-cd /usr/app/socket/ && node index.js & sleep 5 & yarn start & sleep 30s && cd /usr/app/video-analysis && python3 main.py & startx /usr/app/electron/node_modules/electron/dist/electron /usr/app/electron --enable-logging 
+yarn start & sleep 5s && cd /usr/app/socket/ && node index.js & sleep 30s && cd /usr/app/video-analysis && python3 main.py & startx /usr/app/electron/node_modules/electron/dist/electron /usr/app/electron --enable-logging 
 
 while true
 do
