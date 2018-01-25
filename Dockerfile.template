@@ -62,6 +62,9 @@ COPY ./bash /usr/bash
 COPY ./start.sh /usr/
 RUN chmod 777 /usr/start.sh
 
+# install yarn
+RUN npm install -g yarn
+
 # run startup script...
 ENV INITSYSTEM on
 WORKDIR /usr
