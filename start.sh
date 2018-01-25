@@ -37,7 +37,7 @@ umount /dev/shm && mount -t tmpfs shm /dev/shm
 rm /tmp/.X0-lock &>/dev/null || true
 
 # dashboard
-cd /usr/src/dashboard/ && npm run compile
+cd /usr/app/dashboard/ && npm run compile
 
 cd /usr/app/socket/ && node index.js & sleep 5 & yarn start & sleep 30s && cd /usr/app/video-analysis && python3 main.py & startx /usr/app/electron/node_modules/electron/dist/electron /usr/app/electron --enable-logging 
 

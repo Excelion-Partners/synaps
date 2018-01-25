@@ -134,7 +134,7 @@ RUN update-alternatives --config libblas.so.3
 # Install Postgres 9.6
 RUN pip install psycopg2
 
-WORKDIR /usr/src/
+# WORKDIR /usr/src/
 RUN sudo add-apt-repository "deb http://deb.debian.org/debian jessie-backports main"
 RUN sudo apt update
 RUN sudo apt upgrade
