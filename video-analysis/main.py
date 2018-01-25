@@ -30,8 +30,8 @@ def draw_label(image, point, label, font=cv2.FONT_HERSHEY_SIMPLEX,
 
 def main(sess,age,gender,train_mode,images_pl):
     LOCAL_MODE = os.getenv('LOCAL_MODE', 'True') == 'True'
-    TIME_BETWEEN_READS = float(os.getenv('TIME_BETWEEN_READS', .3))
-    TIME_BETWEEN_DEMO = float(os.getenv('TIME_BETWEEN_DEMO', .5))
+    TIME_BETWEEN_READS = float(os.getenv('TIME_BETWEEN_READS', 1.3))
+    TIME_BETWEEN_DEMO = float(os.getenv('TIME_BETWEEN_DEMO', 20.5))
     LIVE_VIDEO =  os.getenv('LIVE_VIDEO', 'True') == 'True'
     REMOVE_USER_TIMEOUT_SECONDS = int(
         os.getenv('REMOVE_USER_TIMEOUT_SECONDS', 60))  # seconds
@@ -131,7 +131,7 @@ def main(sess,age,gender,train_mode,images_pl):
             biggest_img = 0
 
             fd_2 = 0
-            tmp = imutils.resize(img, width=480)
+            #tmp = imutils.resize(img, width=640)
 
             d_ct = 0
             for k, d in enumerate(detected):
@@ -139,42 +139,40 @@ def main(sess,age,gender,train_mode,images_pl):
                 if (len(ages)>0):
                     Logger.log("age: {}".format(int(ages[d_ct])))
 
-                shape = predictor(tmp, d)
+                shape = predictor(img, d)
 
                 fd = datetime.datetime.now()
-                face_descriptor = faceRecog.compute_face_descriptor(tmp, shape)
+                face_descriptor = faceRecog.compute_face_descriptor(img, shape)
                 fd_2 = float((datetime.datetime.now() - fd).microseconds) / 1000000
 
                 found = False
-
-                # drawing the rectangle & label
-                x1, y1, x2, y2, w, h = d.left(), d.top(), d.right() + 1, d.bottom() + 1, d.width(), d.height()
-                cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 2)
-
                 area = d.width() * d.height()
 
                 deets = ''
-                best_match = 0
+                best_match = 100
                 best_face = None
                 for face in tracked_faces:
                     dst = distance.euclidean(face_descriptor, face.descriptor)
 
                     # Logger.log("age: {0}, gender:{1}".format(ages[i], genders[i]))
                     if dst < FACE_MATCH and dst<best_match:
+                        # Logger.log("match {}: {}".format(t, dst))
                         best_match = dst
                         best_face = face
 
                 if best_face is not None:
                     # matches a face we're already tracking
                     found = True
-                    face.recordVisit()
-                    face.descriptor = face_descriptor
+                    best_face.recordVisit()
+                    # face.descriptor = face_descriptor
 
                     if len(ages) > 0:
-                        face.add_age(int(ages[d_ct]))
-                        face.add_sex(genders[d_ct])
+                        best_face.add_age(int(ages[d_ct]))
+                        best_face.add_sex(genders[d_ct])
 
-                    deets = face.detailStr()
+                    deets = best_face.detailStr()
+
+                Logger.log("-------")
 
                 if not found:
                     newFace = Face(face_descriptor)
@@ -193,28 +191,31 @@ def main(sess,age,gender,train_mode,images_pl):
                     current_usr = deets
 
                 if LIVE_VIDEO:
+                    # drawing the rectangle & label
+                    x1, y1, x2, y2, w, h = d.left(), d.top(), d.right() + 1, d.bottom() + 1, d.width(), d.height()
+                    cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 2)
                     draw_label(img, (d.left(), d.top()), deets)
 
                 d_ct += 1
 
-            if faces_tracked != len(tracked_faces):
-                Logger.log('{} tracked face'.format(len(tracked_faces)))
-                faces_tracked = len(tracked_faces)
+                if faces_tracked != len(tracked_faces):
+                    Logger.log('{} tracked face'.format(len(tracked_faces)))
+                    faces_tracked = len(tracked_faces)
 
-            if not LOCAL_MODE and LIVE_VIDEO:
-                socketIO.emit('current-user',{'details': current_usr})
+                if not LOCAL_MODE and LIVE_VIDEO:
+                    socketIO.emit('current-user',{'details': current_usr})
 
-            if LOCAL_MODE:
-                win.set_image(img)
-            if LIVE_VIDEO:
-                frame4 = imutils.resize(img, width=360)
-                #frame4 = cv2.flip(frame4, 1)
+                if LOCAL_MODE:
+                    win.set_image(img)
+                if LIVE_VIDEO:
+                    frame4 = imutils.resize(img, width=360)
+                    #frame4 = cv2.flip(frame4, 1)
 
-                encImg = cv2.imencode('.png', frame4[:])
-                buff = base64.b64encode(encImg[1])
+                    encImg = cv2.imencode('.png', frame4[:])
+                    buff = base64.b64encode(encImg[1])
 
-                socketIO.emit('frame', {"buffer": buff.decode(
-                'utf-8')})
+                    socketIO.emit('frame', {"buffer": buff.decode(
+                    'utf-8')})
             
             t_2 = time.time()-t
 
