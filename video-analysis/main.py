@@ -35,7 +35,7 @@ def main(sess,age,gender,train_mode,images_pl):
     LIVE_VIDEO =  os.getenv('LIVE_VIDEO', 'True') == 'True'
     REMOVE_USER_TIMEOUT_SECONDS = int(
         os.getenv('REMOVE_USER_TIMEOUT_SECONDS', 60))  # seconds
-    FACE_MATCH = .6
+    FACE_MATCH = .5
 
     Logger.log('running in Local mode: {}'.format(LOCAL_MODE))
 
@@ -131,9 +131,13 @@ def main(sess,age,gender,train_mode,images_pl):
             biggest_img = 0
 
             fd_2 = 0
-            tmp = imutils.resize(img, width=320)
+            tmp = imutils.resize(img, width=480)
 
+            d_ct = 0
             for k, d in enumerate(detected):
+
+                if (len(ages)>0):
+                    Logger.log("age: {}".format(int(ages[d_ct])))
 
                 shape = predictor(tmp, d)
 
@@ -150,29 +154,35 @@ def main(sess,age,gender,train_mode,images_pl):
                 area = d.width() * d.height()
 
                 deets = ''
+                best_match = 0
+                best_face = None
                 for face in tracked_faces:
                     dst = distance.euclidean(face_descriptor, face.descriptor)
 
                     # Logger.log("age: {0}, gender:{1}".format(ages[i], genders[i]))
-                    if dst < FACE_MATCH:
-                        # matches a face we're already tracking
-                        found = True
-                        face.recordVisit()
-                        face.descriptor = face_descriptor
+                    if dst < FACE_MATCH and dst<best_match:
+                        best_match = dst
+                        best_face = face
 
-                        if len(ages) > 0:
-                            face.add_age(int(ages[i]))
-                            face.add_sex(genders[i])
+                if best_face is not None:
+                    # matches a face we're already tracking
+                    found = True
+                    face.recordVisit()
+                    face.descriptor = face_descriptor
 
-                        deets = face.detailStr()
+                    if len(ages) > 0:
+                        face.add_age(int(ages[d_ct]))
+                        face.add_sex(genders[d_ct])
+
+                    deets = face.detailStr()
 
                 if not found:
                     newFace = Face(face_descriptor)
                     tracked_faces.append(newFace)
 
                     if len(ages) > 0:
-                        newFace.add_age(int(ages[i]))
-                        newFace.add_sex(genders[i])
+                        newFace.add_age(int(ages[d_ct]))
+                        newFace.add_sex(genders[d_ct])
 
                     deets = newFace.detailStr()
 
@@ -184,6 +194,8 @@ def main(sess,age,gender,train_mode,images_pl):
 
                 if LIVE_VIDEO:
                     draw_label(img, (d.left(), d.top()), deets)
+
+                d_ct += 1
 
             if faces_tracked != len(tracked_faces):
                 Logger.log('{} tracked face'.format(len(tracked_faces)))
@@ -204,10 +216,10 @@ def main(sess,age,gender,train_mode,images_pl):
                 socketIO.emit('frame', {"buffer": buff.decode(
                 'utf-8')})
             
-            # t_2 = time.time()-t
-            #
-            # if fd_2 > 0:
-            #     Logger.log('total {0}s | detector {1}s | gender {2}s | descriptor {3}s '.format(t_2, d_2, g_2, fd_2))
+            t_2 = time.time()-t
+
+            if fd_2 > 0:
+                Logger.log('total {0}s | detector {1}s | gender {2}s | descriptor {3}s '.format(t_2, d_2, g_2, fd_2))
             #
             #   n_sync = '{}_{}'.format(now.minute, now.second)
             #

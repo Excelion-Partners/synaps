@@ -62,7 +62,6 @@ class Face:
         self.age_ct += 1
 
     def add_sex(self, sex):
-        # Logger.log('{0}, {1}'.format(self.sex_tot, self.sex_ct))
         self.sex_tot += sex
         self.sex_ct += 1
 
@@ -81,7 +80,7 @@ class Face:
         return age
 
     def detailStr(self):
-       return '{0} {1}'.format(int(self.age()), self.sex())
+       return '{0} {1} {2}'.format(int(self.age()), self.sex(), self.id)
 
     def endCurrentSession(self):
         ses = self.currentSession()
