@@ -6,11 +6,7 @@ export class LiveFeed extends React.Component {
 	constructor(props) {
 		super(props)
 
-		var protocol = window.locationlocation.protocol;
-		var slashes = protocol.concat("//");
-		var host = slashes.concat(window.location.hostname);
-
-		var socket = io.connect(host + ':3001')
+		var socket = io.connect('http://localhost:3001')
 
 		this.state = {
 			binData: 'test'
