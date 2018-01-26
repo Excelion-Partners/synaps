@@ -25,6 +25,7 @@ class Face:
         self.age_ct = 0
         self.sex_tot = 0
         self.sex_ct = 0
+        self.largest_img = 0
      
         self.appendNewSession()
 

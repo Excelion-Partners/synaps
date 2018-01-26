@@ -11,6 +11,7 @@ import arrow
 import numpy as np
 from scipy.spatial import distance
 from socketIO_client import SocketIO, LoggingNamespace
+import threading
 
 import inception_resnet_v1
 import tensorflow as tf
@@ -30,7 +31,7 @@ def draw_label(image, point, label, font=cv2.FONT_HERSHEY_SIMPLEX,
 
 def main(sess,age,gender,train_mode,images_pl):
     LOCAL_MODE = os.getenv('LOCAL_MODE', 'True') == 'True'
-    TIME_BETWEEN_READS = float(os.getenv('TIME_BETWEEN_READS', .3))
+    TIME_BETWEEN_READS = float(os.getenv('TIME_BETWEEN_READS', .1))
     TIME_BETWEEN_DEMO = float(os.getenv('TIME_BETWEEN_DEMO', .5))
     LIVE_VIDEO =  os.getenv('LIVE_VIDEO', 'True') == 'True'
     REMOVE_USER_TIMEOUT_SECONDS = int(
@@ -168,6 +169,10 @@ def main(sess,age,gender,train_mode,images_pl):
                         best_face.add_age(int(ages[d_ct]))
                         best_face.add_sex(genders[d_ct])
 
+                    if best_face.largest_img < area:
+                        best_face.largest_img = area
+                        best_face.descriptor = face_descriptor
+
                     deets = best_face.detailStr()
 
                 Logger.log("-------")
@@ -206,14 +211,10 @@ def main(sess,age,gender,train_mode,images_pl):
             if LOCAL_MODE:
                 win.set_image(img)
             if LIVE_VIDEO:
-                frame4 = imutils.resize(img, width=360)
-                #frame4 = cv2.flip(frame4, 1)
-
-                encImg = cv2.imencode('.png', frame4[:])
-                buff = base64.b64encode(encImg[1])
-
-                socketIO.emit('frame', {"buffer": buff.decode(
-                'utf-8')})
+                t1 = threading.Thread(target=send_frame, args=(img, socketIO))
+                # t1 = FuncThread(send_frame, img, socketIO)
+                t1.start()
+                t1.join()
             
             t_2 = time.time()-t
 
@@ -233,6 +234,16 @@ def main(sess,age,gender,train_mode,images_pl):
             #
             #         if r is not False:
             #             storage.updateSessionSyncStatus(unsyncd)
+
+
+def send_frame(img, socketIO):
+    frame4 = imutils.resize(img, width=360)
+    # frame4 = cv2.flip(frame4, 1)
+    encImg = cv2.imencode('.png', frame4[:])
+    buff = base64.b64encode(encImg[1])
+    socketIO.emit('frame', {"buffer": buff.decode(
+        'utf-8')})
+
 
 def check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces):
     # iterate all the existing tracked_faces we know of and clean them up
