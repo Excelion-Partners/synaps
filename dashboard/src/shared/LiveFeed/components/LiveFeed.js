@@ -6,7 +6,11 @@ export class LiveFeed extends React.Component {
 	constructor(props) {
 		super(props)
 
-		var socket = io.connect('http://localhost:3001')
+		var protocol = window.locationlocation.protocol;
+		var slashes = protocol.concat("//");
+		var host = slashes.concat(window.location.hostname);
+
+		var socket = io.connect(host + ':3001')
 
 		this.state = {
 			binData: 'test'
@@ -36,7 +40,7 @@ export class LiveFeed extends React.Component {
 		}
 
 		var vidPadding = {
-			paddingTop:'15px'
+			paddingTop: '15px'
 		}
 
 		// var video = {
@@ -46,13 +50,23 @@ export class LiveFeed extends React.Component {
 		// 	marginTop: '15px'
 		// }
 
-		return (
-			<div>
-				<div style={label}>Live Feed (DEMO):</div>
-				<div style={vidPadding}>
-					<img className='img-responsive' src={"data:image/png;base64," + this.state.binData} />
-				</div>
-			</div>
+		return ( <
+			div >
+			<
+			div style = {
+				label
+			} > Live Feed(DEMO): < /div> <
+			div style = {
+				vidPadding
+			} >
+			<
+			img className = 'img-responsive'
+			src = {
+				"data:image/png;base64," + this.state.binData
+			}
+			/> < /
+			div > <
+			/div>
 		)
 	}
 }
