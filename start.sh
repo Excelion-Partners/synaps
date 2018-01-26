@@ -39,7 +39,7 @@ rm /tmp/.X0-lock &>/dev/null || true
 # dashboard
 cd /usr/app/dashboard/
 
-yarn start & sleep 15s && startx /usr/app/electron/node_modules/electron/dist/electron /usr/app/electron --enable-logging & cd /usr/app/socket/ && node index.js & sleep 1s && cd /usr/app/video-analysis && python3 main.py 
+yarn start & sleep 15s && startx /usr/app/electron/node_modules/electron/dist/electron /usr/app/electron --enable-logging & cd /usr/app/socket/ && node index.js & sleep 1s & cd /usr/app/video-analysis && python3 main.py 
 
 while true
 do
