@@ -39,7 +39,7 @@
       var _socket;
 
       function init() {
-        var src = 'http://localhost:3001/';
+        var src = 'http://192.168.1.94:3001/';
         _socket = io(src);
         _socket.on('connect', function () {
           console.log('connected')
@@ -63,7 +63,7 @@
 
 <body>
   <img id="current-img">
-  <iframe id="vid-frame" frameborder="0" src="http://localhost/rolex.html" height="100%" width="100%"></iframe>
+  <iframe id="vid-frame" frameborder="0" src="http://192.168.1.94/rolex.html" height="100%" width="100%"></iframe>
 </body>
 
 </html>
