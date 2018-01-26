@@ -206,10 +206,10 @@ def main(sess,age,gender,train_mode,images_pl):
             if LOCAL_MODE:
                 win.set_image(img)
             if LIVE_VIDEO:
-                #frame4 = imutils.resize(img, width=320)
+                frame4 = imutils.resize(img, width=360)
                 #frame4 = cv2.flip(frame4, 1)
 
-                encImg = cv2.imencode('.png', img[:])
+                encImg = cv2.imencode('.png', frame4[:])
                 buff = base64.b64encode(encImg[1])
 
                 socketIO.emit('frame', {"buffer": buff.decode(
