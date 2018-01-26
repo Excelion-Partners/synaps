@@ -40,6 +40,9 @@ RUN unzip archive.zip
 RUN rm archive.zip
 COPY ./video-analysis .
 
+# install yarn
+RUN npm install -g yarn
+
 # socket
 RUN mkdir /usr/app/socket
 COPY ./socket /usr/app/socket
@@ -60,8 +63,6 @@ COPY ./bash /usr/bash
 COPY ./start.sh /usr/
 RUN chmod 777 /usr/start.sh
 
-# install yarn
-RUN npm install -g yarn
 
 # run startup script...
 ENV INITSYSTEM on
