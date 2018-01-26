@@ -51,7 +51,8 @@ RUN JOBS=MAX npm install --unsafe-perm --production \
 RUN mkdir /usr/app/dashboard
 WORKDIR /usr/app/dashboard
 COPY ./dashboard/package.json ./
-RUN JOBS=MAX npm install --unsafe-perm --production
+#RUN JOBS=MAX npm install --unsafe-perm --production
+RUN npm install
 COPY ./dashboard ./
 
 # web
