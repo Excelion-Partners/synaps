@@ -71,16 +71,14 @@
         var uuid = "167f68a7-4ce5-4958-b8b5-0f0feab9e135";
         //var container = $("#claraContainer");
         var clara = claraplayer("claraContainer");
+        ["orbit", "pan", "zoom", "vrMode", "home", "fullscreen"].map(function (tool) { return clara.player.hideTool(tool) });
+        
         clara.on('loaded', function () {
             console.log('Clara player is loaded and ready');
         });
         clara.on('threeinitialized', function () {
             console.log('threeinitialized');
         })
-
-        // ["orbit", "pan", "zoom", "vrMode", "home", "fullscreen"].map(function (tool) {
-        //     return clara.player.hideTool(tool)
-        // });
 
         clara.on("rendered", function () {
             console.log("Clara player is rendered.");
