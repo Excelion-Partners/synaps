@@ -33,6 +33,8 @@ def main(sess,age,gender,train_mode,images_pl):
     LOCAL_MODE = os.getenv('LOCAL_MODE', 'True') == 'True'
     TIME_BETWEEN_READS = float(os.getenv('TIME_BETWEEN_READS', .1))
     TIME_BETWEEN_DEMO = float(os.getenv('TIME_BETWEEN_DEMO', .5))
+    TIME_BETWEEN_VIDEO = float(os.getenv('TIME_BETWEEN_DEMO', 1.0))
+
     LIVE_VIDEO =  os.getenv('LIVE_VIDEO', 'True') == 'True'
     REMOVE_USER_TIMEOUT_SECONDS = int(
         os.getenv('REMOVE_USER_TIMEOUT_SECONDS', 60))  # seconds
@@ -74,6 +76,7 @@ def main(sess,age,gender,train_mode,images_pl):
 
     last_read = arrow.now()
     last_demo = arrow.now()
+    last_video = arrow.now()
 
     while True:
         now = arrow.now()
@@ -211,10 +214,14 @@ def main(sess,age,gender,train_mode,images_pl):
             if LOCAL_MODE:
                 win.set_image(img)
             if LIVE_VIDEO:
-                t1 = threading.Thread(target=send_frame, args=(img, socketIO))
-                # t1 = FuncThread(send_frame, img, socketIO)
-                t1.start()
-                t1.join()
+                rd = (now - last_video).total_seconds()
+                if (rd > TIME_BETWEEN_VIDEO):
+                    t1 = threading.Thread(target=send_frame, args=(img, socketIO))
+                    # t1 = FuncThread(send_frame, img, socketIO)
+                    t1.start()
+                    t1.join()
+
+                    last_video = arrow.now()
             
             t_2 = time.time()-t
 
