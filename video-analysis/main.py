@@ -68,10 +68,8 @@ def main(sess,age,gender,train_mode,images_pl):
     # load model and weights
     img_size = 160
 
-    people_in_last_frame = -1
     faces_tracked = -1
     tracked_faces = []
-    frame_ct = 0
 
     last_read = arrow.now()
     last_demo = arrow.now()
@@ -208,7 +206,7 @@ def main(sess,age,gender,train_mode,images_pl):
                 if LOCAL_MODE:
                     win.set_image(img)
                 if LIVE_VIDEO:
-                    frame4 = imutils.resize(img, width=360)
+                    frame4 = imutils.resize(img, width=320)
                     #frame4 = cv2.flip(frame4, 1)
 
                     encImg = cv2.imencode('.png', frame4[:])
