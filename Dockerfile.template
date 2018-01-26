@@ -54,6 +54,7 @@ RUN JOBS=MAX npm install --unsafe-perm --production \
 RUN mkdir /usr/app/dashboard
 WORKDIR /usr/app/dashboard
 COPY ./dashboard ./
+RUN yarn install 
 
 # web
 COPY ./web /var/www/html
