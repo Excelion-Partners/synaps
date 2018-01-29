@@ -36,7 +36,7 @@ umount /dev/shm && mount -t tmpfs shm /dev/shm
 
 rm /tmp/.X0-lock &>/dev/null || true
 
- if [ $DASHBOARD = "1" ];
+if [ $DASHBOARD = "1" ];
 then
     # dashboard
     cd /usr/app/dashboard/
