@@ -1,0 +1,195 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Jack Daniel's Demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            font-family: Monospace;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="../scripts/three.js"></script>
+    <script src="../scripts/TDSLoader.js"></script>
+    <script src="../scripts/TrackballControls.js"></script>
+
+    <script>
+        var container, camera, scene, renderer, mainObj, controls;
+
+        init();
+        animate();
+
+        function init() {
+            container = document.createElement("div");
+            document.body.appendChild(container);
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 10000);
+            camera.position.z = 30;
+
+            controls = new THREE.TrackballControls(camera);
+            controls.rotateSpeed = 1.0;
+            controls.zoomSpeed = 3;
+            controls.panSpeed = 0.8;
+            controls.noZoom = false;
+            controls.noPan = false;
+            controls.staticMoving = true;
+            controls.dynamicDampingFactor = 0.3;
+            controls.keys = [65, 83, 68];
+            controls.addEventListener("change", render);
+
+            scene = new THREE.Scene();
+            scene.add(new THREE.AmbientLight());
+
+            var directionalLight = new THREE.DirectionalLight(0xffeedd);
+            directionalLight.position.set(0, 0, 2);
+            scene.add(directionalLight);
+
+
+            // FLOOR
+            var floorTexture = new THREE.ImageUtils.loadTexture('textures/wood.jpg');
+            floorTexture.minFilter = THREE.linearFilter;
+            floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+            floorTexture.repeat.set(10, 10);
+            var floorMaterial = new THREE.MeshBasicMaterial({ map: floorTexture, side: THREE.DoubleSide });
+            var floorGeometry = new THREE.PlaneGeometry(100, 100, 10, 10);
+            var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            scene.add(floor);
+
+            var onProgress = function (xhr) {
+                if (xhr.lengthComputable) {
+                    window.parent.postMessage({
+                        "message": "loadProgress",
+                        "numOfBytesLoaded": xhr.loaded,
+                        "numOfBytesTotal": xhr.total
+                    }, window.location.href);
+                }
+            };
+
+            var onError = function (error) {
+                window.parent.postMessage({
+                    "message": "loadError",
+                    "error": error
+                });
+            };
+
+            var onLoad = function (object) {
+                object.position.set(0, 0, -3.6);
+                //object.rotateX(THREE.Math.degToRad(-90));
+                //object.rotateZ(THREE.Math.degToRad(-45));
+
+                for (var i = 0; i < object.children.length; i++) {
+                    var child = object.children[i];
+                    console.log(i + ", " + child.name);
+
+                    if (i === -01) {
+                        child.visible = false;
+                    }
+                }
+
+                var labelOpacityTexture = new THREE.ImageUtils.loadTexture('textures/Label1_Opacity.jpg');
+                labelOpacityTexture.minFilter = THREE.minFilter;
+                object.children[4].material.transparent = true;
+                object.children[5].material.transparent = true;
+                object.children[4].material.alphaMap = labelOpacityTexture;
+                object.children[5].material.alphaMap = labelOpacityTexture;
+
+                object.children[0].material.transparent = true;
+                object.children[0].material.opacity = 0.7;
+
+
+                var refractionCube = new THREE.CubeTextureLoader();
+                refractionCube.mapping = THREE.CubeRefractionMapping;
+                refractionCube.format = THREE.RGBFormat;
+                object.children[6].material = new THREE.MeshLambertMaterial({ color: 0xffee00, refractionRatio: 0.95 });
+
+
+                var topperTexture = new THREE.ImageUtils.loadTexture('textures/Bourbon_Lid_Diffuse.jpg');
+                topperTexture.minFilter = THREE.minFilter;
+                var bumpTexture = new THREE.ImageUtils.loadTexture('textures/Bourbon_Lid_Bump.jpg');
+                object.children[3].material = new THREE.MeshPhongMaterial({ map: topperTexture, bumpMap: bumpTexture });
+
+                var corkTexture = new THREE.ImageUtils.loadTexture('textures/cork.jpg');
+                corkTexture.minFilter = THREE.minFilter;
+                //object.children[1].material = new THREE.MeshPhongMaterial( { map: corkTexture } );
+
+
+                var yy = -3.63;
+                object.children[4].position.y += yy;
+                object.children[5].position.y += yy;
+
+                var zz = 3;
+                object.children[4].position.z += zz;
+                object.children[5].position.z += zz;
+
+                object.children[2].position.z += -4.75;
+
+                var yy3 = -3.6;
+                var zz3 = 3.9;
+                object.children[1].position.y += yy3;
+                object.children[3].position.y += yy3;
+                object.children[1].position.z += zz3;
+                object.children[3].position.z += zz3;
+
+                object.children[0].name = "BottleAndWhiskey";
+                object.children[1].name = "Cork";
+                object.children[2].name = "InsideLabel";
+                object.children[3].name = "Top";
+                object.children[4].name = "FrontLabel";
+                object.children[5].name = "BackLabel";
+                object.children[6].name = "BottleGlassTop";
+
+                scene.add(object);
+                mainObj = object;
+
+                var axes = new THREE.AxesHelper(50);
+                axes.position = object.position;
+                scene.add(axes);
+
+                window.parent.postMessage({ "message": "loadComplete" }, window.location.href);
+            };
+
+            var loader = new THREE.TDSLoader();
+            loader.debug = false;
+            loader.setPath("textures/");
+            loader.load("bourbon.3ds", onLoad, onProgress, onError);
+
+
+            renderer = new THREE.WebGLRenderer();
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            container.appendChild(renderer.domElement);
+            window.addEventListener("resize", resize, false);
+        }
+
+        function resize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            controls.handleResize();
+            render();
+        }
+
+        function animate() {
+            if (mainObj) {
+                mainObj.rotation.z += 0.01;
+            }
+
+            requestAnimationFrame(animate);
+            controls.update();
+            render();
+        }
+
+        function render() {
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Jack Daniel's Demo</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+
+	<body>
+		<script src="three.js"></script>
+    <script src="OBJLoader.js"></script>
+    <script src="TrackballControls.js"></script>
+
+		<script>
+        var container, camera, scene, renderer, mainObj, controls;
+  
+        function init() {
+            container = document.createElement("div");
+            document.body.appendChild(container);
+  
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 10000);
+            camera.position.z = 30;
+  
+            controls = new THREE.TrackballControls(camera);
+            controls.rotateSpeed = 1.0;
+            controls.zoomSpeed = 1.2;
+            controls.panSpeed = 0.8;
+            controls.noZoom = false;
+            controls.noPan = false;
+            controls.staticMoving = true;
+            controls.dynamicDampingFactor = 0.3;
+            controls.keys = [65, 83, 68];
+            controls.addEventListener("change", render);
+  
+            scene = new THREE.Scene();
+            scene.add(new THREE.HemisphereLight());
+  
+            var directionalLight = new THREE.DirectionalLight(0xffeedd);
+            directionalLight.position.set(0, 0, 2);
+            scene.add(directionalLight);
+  
+            var onProgress = function(xhr) {
+                if (xhr.lengthComputable) {
+                    window.parent.postMessage({
+                        "message": "loadProgress",
+                        "numOfBytesLoaded": xhr.loaded,
+                        "numOfBytesTotal": xhr.total
+                    }, window.location.href);
+                }
+            };
+  
+            var onError = function(error) {
+                window.parent.postMessage({
+                    "message": "loadError",
+                    "error": error
+                });
+            };
+  
+            var onLoad = function(data) {
+                //data.position.set(0, 0, 0);
+                //data.rotateX(THREE.Math.degToRad(-45));
+
+                scene.add(data);
+                mainObj = data;
+  
+                window.parent.postMessage({"message": "loadComplete"}, window.location.href);
+            };
+        
+            var loader = new THREE.OBJLoader();
+            loader.load("Bourbon.obj", onLoad, onProgress, onError);
+    
+  
+            renderer = new THREE.WebGLRenderer();
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+  
+            container.appendChild(renderer.domElement);
+            window.addEventListener("resize", resize, false);
+        }
+  
+        function resize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            controls.handleResize();
+            render();
+        }     
+  
+        function animate() {
+            if (mainObj) {
+                mainObj.rotation.z += 0.01;
+            }
+        
+            requestAnimationFrame(animate);
+            controls.update();
+            render();
+        }
+  
+        function render() {
+            renderer.render(scene, camera);
+        }      
+  
+        init();
+        animate();
+		</script> 
+	</body>
+</html>
