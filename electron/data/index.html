@@ -21,6 +21,15 @@
       z-index: 1;
     }
 
+    .flip-horizontal {
+      -moz-transform: scaleX(-1);
+      -o-transform: scaleX(-1);
+      -webkit-transform: scaleX(-1);
+      transform: scaleX(-1);
+      filter: FlipH;
+      -ms-filter: "FlipH";
+    }
+
     #current-img {
       top: 0;
       right: 0px;
@@ -66,7 +75,7 @@
 
 <body>
   <img id="current-img">
-  <iframe id="vid-frame" frameborder="0" src="http://localhost/rolex.html" height="100%" width="100%"></iframe>
+  <iframe id="vid-frame" class="flip-horizontal" frameborder="0" src="http://localhost/rolex.html" height="100%" width="100%"></iframe>
 </body>
 
 </html>
