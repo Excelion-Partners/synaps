@@ -18,7 +18,7 @@
       overflow: hidden;
       height: 100%;
       width: 100%;
-      z-index: 1;
+      z-index: 10;
     }
 
     .flip-horizontal {
@@ -31,9 +31,9 @@
     }
 
     #current-img {
-      top: 0;
-      right: 0px;
-      z-index: 10;
+      top: 4;
+      right: 4px;
+      z-index: 1;
       width: 320px;
       height: 240px;
       position: absolute;
@@ -58,24 +58,22 @@
           //     $('#display-div').html(data);
           //   });
           _socket.on('frame', function (data) {
-            $('#current-img').show();
+            $('#current-img').zIndex(20);
             $('#current-img').prop('src', 'data:image/png;base64,' + data.buffer);
           });
         });
 
         _socket.on('disconnect', function () {});
       }
-
-    //   $('#current-img').hide();
       init();
     });
 
   </script>
 </head>
 
-<body>
+<body class="flip-horizontal">
   <img id="current-img">
-  <iframe id="vid-frame" class="flip-horizontal" frameborder="0" src="http://localhost/rolex.html" height="100%" width="100%"></iframe>
+  <iframe id="vid-frame" frameborder="0" src="http://localhost/rolex.html" height="100%" width="100%"></iframe>
 </body>
 
 </html>
