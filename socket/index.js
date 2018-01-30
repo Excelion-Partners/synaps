@@ -88,12 +88,13 @@ io.on('connection', function (socket) {
 
     socket.emit('config', {
         device_id: uuid,
-        customer_id: process.env.customer_id != null ? process.env.customer_id : 1
+        customer_id: process.env.CUSTOMER_ID != null ? process.env.CUSTOMER_ID : 1,
+        flip: process.env.FLIP != null ? process.env.FLIP : false,
     });
 
     socket.on('frame', function (frame) {
         socket.broadcast.emit('frame', frame);
-        console.log('new frame')
+      //  console.log('new frame')
     });
 })
 

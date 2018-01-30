@@ -76,6 +76,7 @@
     var _socket;
     var _device_id = null;
     var _customer_id = null;
+    var _flip = false;
 
     function init_firebase() {
       firebase.initializeApp(firebase_config);
@@ -89,6 +90,17 @@
       });
     }
 
+    function applyConfig(data) {
+      _flip = data.flip;
+      _customer_id = data.customer_id;
+      _device_id = data.device_id;
+
+      if (_flip){
+        $('#user-div').addClass('flip-horizontal');
+        $('#vid-frame').addClass('flip-horizontal');
+      }
+    }
+
 
     $(document).ready(function () {
 
@@ -98,9 +110,8 @@
         _socket.on('connect', function () {
           console.log('connected')
           _socket.on('config', function (data) {
-            _customer_id = data.customer_id;
-            _device_id = data.device_id;
 
+            applyConfig(data);
             init_firebase();
 
             _socket.on('frame', function (data) {
@@ -119,10 +130,10 @@
 </head>
 
 <body>
-  <div id="user-div" class="flip-horizontal">
+  <div id="user-div" >
     <img id="current-img">
   </div>
-  <iframe class="flip-horizontal" id="vid-frame" frameborder="0" src="http://localhost/rolex.html" height="100%" width="100%"></iframe>
+  <iframe id="vid-frame" frameborder="0" src="http://localhost/rolex.html" height="100%" width="100%"></iframe>
 </body>
 
 </html>
