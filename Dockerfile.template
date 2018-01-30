@@ -57,6 +57,7 @@ COPY ./dashboard ./
 RUN yarn install 
 
 # web
+COPY ./apache/000-default.conf /usr/apache
 COPY ./web /var/www/html
 
 # bash
