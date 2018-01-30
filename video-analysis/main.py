@@ -244,7 +244,7 @@ def main(sess,age,gender,train_mode,images_pl):
 
 
 def send_frame(img, socketIO):
-    frame4 = imutils.resize(img, width=360)
+    frame4 = imutils.resize(img, width=320)
     # frame4 = cv2.flip(frame4, 1)
     encImg = cv2.imencode('.png', frame4[:])
     buff = base64.b64encode(encImg[1])
