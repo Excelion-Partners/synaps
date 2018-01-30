@@ -1,58 +1,79 @@
-<!DOCTYPE html>
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <title>Synaps</title>
+  <meta charset="utf-8">
+  <title>Synaps</title>
 
-    <style type="text/css">
-        html,
-        body {
-            height: 100%;
-            margin: 0px;
-            padding: 0px;
-            background-color: black;
-        }
+  <style type="text/css">
+    html,
+    body {
+      height: 100%;
+      margin: 0px;
+      padding: 0px;
+      background-color: black;
+      overflow: hidden;
+    }
 
-        #display-div {
-           
-            color: white;
-            font-size: 100px;
-        }
-    </style>
+    #vid-frame {
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+      z-index: 1;
+    }
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            var _socket;
+    .flip-horizontal {
+      -moz-transform: scaleX(-1);
+      -o-transform: scaleX(-1);
+      -webkit-transform: scaleX(-1);
+      transform: scaleX(-1);
+      filter: FlipH;
+      -ms-filter: "FlipH";
+    }
 
-            function init() {
-                var src = 'http://localhost:3003/';
-                _socket = io(src);
-                _socket.on('connect', function () {
-                    console.log('connected')
+    #current-img {
+      top: 4;
+      right: 4px;
+      z-index: 10;
+      width: 320px;
+      height: 240px;
+      position: absolute;
+    }
 
-                    _socket.on('current-user', function (data) {
-                        $('#display-div').html(data);
-                    });
-                    _socket.on('frame', function (data) {
-                        $('#current-img').prop('src', 'data:image/png;base64,' + data.buffer);
-                    });
-                });
+  </style>
 
-                _socket.on('disconnect', function () {});
-            }
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      var _socket;
 
-            init();
-        })
-    </script>
+      function init() {
+        var src = 'http://localhost:3001/';
+        //src = 'http://192.168.1.94:3001/';
+        _socket = io(src);
+        _socket.on('connect', function () {
+          console.log('connected')
+
+          //   _socket.on('current-user', function (data) {
+          //     $('#display-div').html(data);
+          //   });
+          _socket.on('frame', function (data) {
+            // $('#current-img').zIndex(20);
+            $('#current-img').prop('src', 'data:image/png;base64,' + data.buffer);
+          });
+        });
+
+        _socket.on('disconnect', function () {});
+      }
+      init();
+    });
+
+  </script>
 </head>
 
-<body>
-    <img id="current-img" src="https://i.ytimg.com/vi/lul-Y8vSr0I/hqdefault.jpg" />
-    <div id="display-div">
-    </div>
+<body class="flip-horizontal">
+  <img id="current-img">
+  <iframe id="vid-frame" frameborder="0" src="http://localhost/rolex.html" height="100%" width="100%"></iframe>
 </body>
 
 </html>
