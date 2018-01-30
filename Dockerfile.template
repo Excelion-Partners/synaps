@@ -13,6 +13,14 @@ ENV PGCTL /usr/lib/postgresql/9.6/bin/pg_ctl
 # Move to app dir
 WORKDIR /usr/app
 
+# tensorflow / dlib models
+RUN mkdir /usr/app/video-analysis
+WORKDIR /usr/app/video-analysis
+RUN wget -O archive.zip https://s3.amazonaws.com/synaps-data/Archive.zip
+RUN unzip archive.zip
+RUN rm archive.zip
+COPY ./video-analysis .
+
 # Set Xorg and FLUXBOX preferences
 RUN mkdir -p ~/.fluxbox
 RUN echo "xset s off" > ~/.fluxbox/startup && echo "xserver-command=X -s 0 dpms" >> ~/.fluxbox/startup
@@ -31,14 +39,6 @@ RUN JOBS=MAX npm install --unsafe-perm --production \
 	#&& node_modules/.bin/electron-rebuild
 
 COPY ./electron .
-
-# tensorflow / dlib models
-RUN mkdir /usr/app/video-analysis
-WORKDIR /usr/app/video-analysis
-RUN wget -O archive.zip https://s3.amazonaws.com/synaps-data/Archive.zip
-RUN unzip archive.zip
-RUN rm archive.zip
-COPY ./video-analysis .
 
 # install yarn
 RUN npm install -g yarn

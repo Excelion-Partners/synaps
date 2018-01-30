@@ -30,45 +30,99 @@
       -ms-filter: "FlipH";
     }
 
-    #current-img {
-      top: 0;
-      right: 0px;
+    #user-div {
+      top: 8px;
+      right: 8px;
       z-index: 10;
       width: 320px;
       height: 240px;
       position: absolute;
     }
+
+    #current-img {
+      width: 320px;
+      height: 240px;
+    }
   </style>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
   <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+
+  <!--Firebase initialization-->
+  <script src="https://www.gstatic.com/firebasejs/4.6.1/firebase.js"></script>
+
   <script>
+    function getQueryVariable(variable) {
+      var query = window.location.search.substring(1);
+      var vars = query.split('&');
+      for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split('=');
+        if (decodeURIComponent(pair[0]) == variable) {
+          return decodeURIComponent(pair[1]);
+        }
+      }
+      console.log('Query variable %s not found', variable);
+    }
+
+    var firebase_config = {
+      apiKey: "AIzaSyD9g3sm1t5rjpgtJlNBuRk3_ycH0CYZzGg",
+      authDomain: "synaps-f7720.firebaseapp.com",
+      databaseURL: "https://synaps-f7720.firebaseio.com",
+      projectId: "synaps-f7720",
+      storageBucket: "synaps-f7720.appspot.com",
+      messagingSenderId: "418060779748"
+    };
+
+    var _socket;
+    var _device_id = null;
+    var _customer_id = null;
+
+    function init_firebase() {
+      firebase.initializeApp(firebase_config);
+
+      var devicePath = "customers/" + _customer_id + "/devices/" + _device_id +
+        "/displayUrl";
+
+      var deviceRef = firebase.database().ref(devicePath);
+      deviceRef.on("value", function (snapshot) {
+        $('#vid-frame').prop('src', snapshot.val())
+      });
+    }
+
+
     $(document).ready(function () {
-      var _socket;
 
       function init() {
         var src = 'http://localhost:3001/';
         _socket = io(src);
         _socket.on('connect', function () {
           console.log('connected')
-          _socket.on('frame', function (data) {
-            $('#current-img').show();
-            $('#current-img').prop('src', 'data:image/png;base64,' + data.buffer);
+          _socket.on('config', function (data) {
+            _customer_id = data.customer_id;
+            _device_id = data.device_id;
+
+            init_firebase();
+
+            _socket.on('frame', function (data) {
+              $('#user-div').show();
+              $('#current-img').prop('src', 'data:image/png;base64,' + data.buffer);
+            });
           });
         });
 
-        _socket.on('disconnect', function () { });
+        _socket.on('disconnect', function () {});
       }
-      $('#current-img').hide();
+      $('#user-div').hide();
       init();
     });
-
   </script>
 </head>
 
-<body class="flip-horizontal">
-  <img id="current-img">
-  <iframe id="vid-frame" frameborder="0" src="http://localhost/rolex.html" height="100%" width="100%"></iframe>
+<body>
+  <div id="user-div" class="flip-horizontal">
+    <img id="current-img">
+  </div>
+  <iframe class="flip-horizontal" id="vid-frame" frameborder="0" src="http://localhost/rolex.html" height="100%" width="100%"></iframe>
 </body>
 
 </html>

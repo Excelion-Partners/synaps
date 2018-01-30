@@ -16,55 +16,55 @@ var fb = firebase.initializeApp({
 var uuid = process.env.RESIN_DEVICE_UUID != null ? process.env.RESIN_DEVICE_UUID : 'local';
 var device_name = process.env.RESIN_DEVICE_NAME_AT_INIT != null ? process.env.RESIN_DEVICE_NAME_AT_INIT : 'local';
 
-fb.database().ref('devices/' + uuid).on('value', function (dataSnapshot) {
-    _deviceData = dataSnapshot.val();
+// fb.database().ref('devices/' + uuid).on('value', function (dataSnapshot) {
+//     _deviceData = dataSnapshot.val();
 
-    if (_deviceData == null)
-        _deviceData = {
+//     if (_deviceData == null)
+//         _deviceData = {
 
-        };
+//         };
 
-    _deviceData.name = device_name;
+//     _deviceData.name = device_name;
 
-    // console.log('new value: ' + JSON.stringify(dataSnapshot))
+//     // console.log('new value: ' + JSON.stringify(dataSnapshot))
 
-    if (_deviceData['session-ct'] == null)
-        _deviceData['session-ct'] = 0;
-    if (_deviceData['session-len'] == null)
-        _deviceData['session-len'] = 0;
-    if (_deviceData['male-ct'] == null)
-        _deviceData['male-ct'] = 0;
-    if (_deviceData['female-ct'] == null)
-        _deviceData['female-ct'] = 0;
-    if (_deviceData['youth-ct'] == null)
-        _deviceData['youth-ct'] = 0;
-    if (_deviceData['young-ct'] == null)
-        _deviceData['young-ct'] = 0;
-    if (_deviceData['adult-ct'] == null)
-        _deviceData['adult-ct'] = 0;
-    if (_deviceData['senior-ct'] == null)
-        _deviceData['senior-ct'] = 0;
+//     if (_deviceData['session-ct'] == null)
+//         _deviceData['session-ct'] = 0;
+//     if (_deviceData['session-len'] == null)
+//         _deviceData['session-len'] = 0;
+//     if (_deviceData['male-ct'] == null)
+//         _deviceData['male-ct'] = 0;
+//     if (_deviceData['female-ct'] == null)
+//         _deviceData['female-ct'] = 0;
+//     if (_deviceData['youth-ct'] == null)
+//         _deviceData['youth-ct'] = 0;
+//     if (_deviceData['young-ct'] == null)
+//         _deviceData['young-ct'] = 0;
+//     if (_deviceData['adult-ct'] == null)
+//         _deviceData['adult-ct'] = 0;
+//     if (_deviceData['senior-ct'] == null)
+//         _deviceData['senior-ct'] = 0;
 
-});
+// });
 
-fb.database().ref('ads').on('value', function (dataSnapshot) {
-    var ads = dataSnapshot.val();
+// fb.database().ref('ads').on('value', function (dataSnapshot) {
+//     var ads = dataSnapshot.val();
 
-    for (var x = 0; x < ads.length; x++) {
-        for (var y = 0; y < ads[x].set.length; y++) {
-            var nm = ads[x].set[y].image;
-            if (nm == null)
-                nm = ads[x].set[y].video;
+//     for (var x = 0; x < ads.length; x++) {
+//         for (var y = 0; y < ads[x].set.length; y++) {
+//             var nm = ads[x].set[y].image;
+//             if (nm == null)
+//                 nm = ads[x].set[y].video;
 
-            _adData[_adData.length] = {
-                'name': nm,
-                'slots': []
-            };
-        }
-    }
+//             _adData[_adData.length] = {
+//                 'name': nm,
+//                 'slots': []
+//             };
+//         }
+//     }
 
-    console.log("ADS:" + JSON.stringify(_adData));
-});
+//     console.log("ADS:" + JSON.stringify(_adData));
+// });
 
 app.all('*', function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
@@ -82,15 +82,18 @@ var io = require('socket.io')(server)
 var _socket;
 console.log('starting socket')
 io.on('connection', function (socket) {
-    _socket = socket;
+    // _socket = socket;
 
-    _socket.on('current-user', function (usr) {
-        _socket.broadcast.emit('current-user', usr.details);
+    console.log('connection')
+
+    socket.emit('config', {
+        device_id: uuid,
+        customer_id: process.env.customer_id != null ? process.env.customer_id : 1
     });
 
-    _socket.on('frame', function (frame) {
-        _socket.broadcast.emit('frame', frame);
-       // console.log('new frame')
+    socket.on('frame', function (frame) {
+        socket.broadcast.emit('frame', frame);
+        console.log('new frame')
     });
 })
 
