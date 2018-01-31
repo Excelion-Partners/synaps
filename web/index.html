@@ -53,17 +53,6 @@
   <script src="https://www.gstatic.com/firebasejs/4.6.1/firebase.js"></script>
 
   <script>
-    function getQueryVariable(variable) {
-      var query = window.location.search.substring(1);
-      var vars = query.split('&');
-      for (var i = 0; i < vars.length; i++) {
-        var pair = vars[i].split('=');
-        if (decodeURIComponent(pair[0]) == variable) {
-          return decodeURIComponent(pair[1]);
-        }
-      }
-      console.log('Query variable %s not found', variable);
-    }
 
     var firebase_config = {
       apiKey: "AIzaSyD9g3sm1t5rjpgtJlNBuRk3_ycH0CYZzGg",
@@ -96,7 +85,7 @@
       _customer_id = data.customer_id;
       _device_id = data.device_id;
 
-      if (_flip){
+      if (_flip) {
         $('#user-div').addClass('flip-horizontal');
         $('#vid-frame').addClass('flip-horizontal');
       }
@@ -106,11 +95,13 @@
     $(document).ready(function () {
 
       function init() {
-        var src =  window.location.protocol + '//' + window.location.host + ':3001';
+        var src = window.location.protocol + '//' + window.location.host + ':3001';
         _socket = io(src);
         _socket.on('connect', function () {
           console.log('connected')
           _socket.on('config', function (data) {
+
+            console.log('received config');
 
             applyConfig(data);
             init_firebase();
@@ -122,8 +113,9 @@
           });
         });
 
-        _socket.on('disconnect', function () {});
+        _socket.on('disconnect', function () { });
       }
+
       $('#user-div').hide();
       init();
     });
@@ -131,7 +123,7 @@
 </head>
 
 <body>
-  <div id="user-div" >
+  <div id="user-div">
     <img id="current-img">
   </div>
   <iframe id="vid-frame" frameborder="0" src="http://localhost/rolex.html" height="100%" width="100%"></iframe>
