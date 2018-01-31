@@ -1,4 +1,4 @@
-// const express = require('express');
+const express = require('express');
 const http = require('http');
 var io = require('socket.io')(http);
 
@@ -18,10 +18,7 @@ server.listen(port, function () {
     console.log('SOCKETIO server listening on port ' + port)
 })
 
-// var io = require('socket.io')(server)
-// const io = require('socket.io')(3001, {
-//     path: '/socket.io'
-// });
+var io = require('socket.io')(server)
 
 // var _socket;
 console.log('starting socket')
