@@ -38,6 +38,12 @@ io.on('connection', function (socket) {
         flip: process.env.FLIP != null ? process.env.FLIP : false,
     });
 
+
+    socket.on('current', function (frame) {
+        socket.broadcast.emit('current', frame);
+        //  console.log('new frame')
+    });
+
     socket.on('frame', function (frame) {
         socket.broadcast.emit('frame', frame);
         //  console.log('new frame')
