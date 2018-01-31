@@ -43,7 +43,7 @@ def main(sess,age,gender,train_mode,images_pl):
     Logger.log('running in Local mode: {}'.format(LOCAL_MODE))
 
     # if not LOCAL_MODE:
-    socketIO = SocketIO('localhost', 3001, LoggingNamespace)
+    socketIO = SocketIO('http://localhost/socket.io', 3001, LoggingNamespace)
     Logger.log("Connected to socket.io")
 
     Logger.log("LIVE_VIDEO: {}".format(LIVE_VIDEO))
