@@ -1,0 +1,85 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Synaps</title>
+
+  <style type="text/css">
+    html,
+    body {
+      height: 100%;
+      margin: 0px;
+      padding: 0px;
+      background-color: black;
+      overflow: hidden;
+    }
+
+    #vid-frame {
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+      z-index: 1;
+    }
+
+    .flip-horizontal {
+      -moz-transform: scaleX(-1);
+      -o-transform: scaleX(-1);
+      -webkit-transform: scaleX(-1);
+      transform: scaleX(-1);
+      filter: FlipH;
+      -ms-filter: "FlipH";
+    }
+
+    #current-img {
+      width: 640;
+      height: 480px;
+    }
+  </style>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+
+  <script>
+    var _socket;
+
+    $(document).ready(function () {
+
+      function init() {
+        var src = window.location.protocol + '//' + window.location.host;
+        _socket = io(src, {
+          path: '/socket.io'
+        });
+        _socket.on('connect', function () {
+          console.log('connected');
+
+          _socket.on('frame', function (data) {
+            $('#user-div').show();
+            $('#current-img').prop('src', 'data:image/png;base64,' + data.buffer);
+          });
+          _socket.on('current-users', function (data) {
+            $('#user-div').show();
+            console.log('new user data')
+            $('#user-info').html(JSON.stringify(data));
+            $('#current-img').prop('src', 'data:image/png;base64,' + data.buffer);
+          });
+        });
+
+        _socket.on('disconnect', function () {});
+      }
+
+      $('#user-div').hide();
+      init();
+    });
+  </script>
+</head>
+
+<body>
+  <div id="user-div">
+    <img id="current-img" />
+    <div id="user-info">
+
+    </div>
+  </div>
+</body>
+
+</html>
