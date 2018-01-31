@@ -130,15 +130,26 @@
         });
 
         var _socket;
+        var _currentVideo = '';
 
         function initSocket() {
-            var src = window.location.protocol + '//' + window.location.host + '/socket.io';
-            _socket = io(src);
+            var src = window.location.protocol + '//' + window.location.host;
+            _socket = io(src, {
+                path: '/socket.io'
+            });
             _socket.on('connect', function () {
                 console.log('connected')
 
-                _socket.on('current-users', function (data) {
-                    alert(data);
+                _socket.on('current', function (data) {
+                    var gender = parseFloat(data.gender);
+                    vid = "xNFoxWatPsI";
+                    if (data.gender < .5)
+                        vid = 'bbQ6AZ9Jcxw';
+
+                    if (vid != _currentVideo) {
+                        updateCurrentVideo(vid);
+                        _currentVideo = vid;
+                    }
                 });
             });
 
