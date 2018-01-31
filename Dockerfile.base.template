@@ -36,6 +36,7 @@ RUN apt-get install --force-yes --fix-missing -y \
     rng-tools \
     dnsmasq \
     hostapd \
+    apache2 \
     unzip \
 	software-properties-common python-software-properties \
     cmake \

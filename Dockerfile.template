@@ -57,11 +57,6 @@ COPY ./dashboard ./
 RUN yarn install 
 
 # web
-
-# RUN apt-get update && apt-get install --force-yes --fix-missing -y \
-#     apache2 \
-#     && rm -rf /var/lib/apt/lists/**
-
 RUN mkdir /usr/apache
 COPY ./apache/000-default.conf /usr/apache/000-default.conf
 COPY ./web /var/www/html
@@ -70,7 +65,6 @@ COPY ./web /var/www/html
 COPY ./bash /usr/bash
 COPY ./start.sh /usr/
 RUN chmod 777 /usr/start.sh
-
 
 # run startup script...
 ENV INITSYSTEM on

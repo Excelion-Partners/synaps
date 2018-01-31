@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
     <title>Synaps Demo | Client</title>
     <meta charset="utf-8">
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-      
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+
     <style type="text/css">
-        body, html {
+        body,
+        html {
             margin: 0;
             padding: 0;
             height: 100%;
@@ -29,43 +33,45 @@
             margin: 0;
             border: none;
         }
-        
+
         .flip-horizontal {
             -moz-transform: scaleX(-1);
             -o-transform: scaleX(-1);
             -webkit-transform: scaleX(-1);
             transform: scaleX(-1);
             filter: FlipH;
-            -ms-filter: "FlipH";  
+            -ms-filter: "FlipH";
         }
-        
+
         .carousel.fade {
             opacity: 1;
         }
-        
+
         .carousel.fade .item {
             transition: opacity ease-out .7s;
             left: 0;
-            opacity: 0; /* hide all slides */
+            opacity: 0;
+            /* hide all slides */
             top: 0;
             position: absolute;
             width: 100%;
             display: block;
         }
-        
+
         .carousel.fade .item:first-child {
             top: auto;
-            opacity: 1; /* show first slide */
+            opacity: 1;
+            /* show first slide */
             position: relative;
         }
-        
+
         .carousel.fade .item.active {
             opacity: 1;
-        } 
+        }
     </style>
-    
+
     <!--Firebase initialization-->
-    <script src="https://www.gstatic.com/firebasejs/4.6.1/firebase.js"></script>
+    <script src="//www.gstatic.com/firebasejs/4.6.1/firebase.js"></script>
     <script>
         // Initialize Firebase
         var config = {
@@ -79,16 +85,18 @@
         firebase.initializeApp(config);
     </script>
 </head>
+
 <body>
     <div class="">
         <iframe id="videoIframeCenter" class="videoPlayer" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
     </div>
-                  
+
     <script>
         var href = window.location.href;
         var sidesQsParamLoc = href.indexOf("sides=");
         var defaultNumOfSides = 1;
-        var sides = sidesQsParamLoc === -1 ? defaultNumOfSides : href.substring(sidesQsParamLoc + 6, sidesQsParamLoc + 7) * 1;
+        var sides = sidesQsParamLoc === -1 ? defaultNumOfSides : href.substring(sidesQsParamLoc + 6, sidesQsParamLoc +
+            7) * 1;
         console.log("Set to " + sides + " sides.");
 
         var currentVideoFbPath;
@@ -99,7 +107,9 @@
         }
 
         // For more information on configuring the YouTube player, see https://developers.google.com/youtube/player_parameters?playerVersion=HTML5.
-        var youTubeVideoUrlTemplate = "https://www.youtube.com/embed/{0}?version=3&amp;rel=0&amp;autoplay=1&amp;controls=0&amp;showinfo=0&amp;rel=0&amp;loop=1&amp;playlist={0}&amp;modestbranding=1";
+        var youTubeVideoUrlTemplate =
+            "https://www.youtube.com/embed/{0}?version=3&amp;rel=0&amp;autoplay=1&amp;controls=0&amp;showinfo=0&amp;rel=0&amp;loop=1&amp;playlist={0}&amp;modestbranding=1";
+
         function updateCurrentVideo(videoId) {
             var videoUrl = youTubeVideoUrlTemplate.replace(/\{0\}/g, videoId);
             var player = document.getElementById("videoIframeCenter");
@@ -109,12 +119,32 @@
 
         var currentVideoFirebaseRef = firebase.database().ref(currentVideoFbPath);
         currentVideoFirebaseRef.on("value", function (snapshot) {
-            var videoData = snapshot.val() || { "videoId": null };
+            var videoData = snapshot.val() || {
+                "videoId": null
+            };
 
-            console.log("Firebase variable '" + currentVideoFbPath + "' value updated: '" + JSON.stringify(videoData) + "'.");
+            console.log("Firebase variable '" + currentVideoFbPath + "' value updated: '" + JSON.stringify(
+                videoData) + "'.");
             updateCurrentVideo(videoData.videoId);
 
         });
+
+        var _socket;
+
+        function initSocket() {
+            var src = window.location.protocol + '//' + window.location.host + '/socket.io';
+            _socket = io(src);
+            _socket.on('connect', function () {
+                console.log('connected')
+
+                _socket.on('current-users', function (data) {
+                    alert(data);
+                });
+            });
+
+            _socket.on('disconnect', function () {});
+        }
     </script>
 </body>
+
 </html>
