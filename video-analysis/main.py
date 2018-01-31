@@ -137,7 +137,7 @@ def main(sess,age,gender,train_mode,images_pl):
                     Logger.log('emitting current')
                     socketIO.emit('current',{'age': "{}".format(age_socket), 'gender': "{}".format(gender_socket), 'ct': "{}".format(people_in_frame)})
             else:
-                socketIO.emit('current',{'age': -1, 'gender': -1, 'ct': 0})
+                socketIO.emit('current',{'age': None, 'gender': None, 'ct': 0})
                 
             check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces)
 

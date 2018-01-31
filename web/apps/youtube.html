@@ -141,14 +141,16 @@
                 console.log('connected')
 
                 _socket.on('current', function (data) {
-                    var gender = parseFloat(data.gender);
-                    vid = "xNFoxWatPsI";
-                    if (data.gender < .5)
-                        vid = 'bbQ6AZ9Jcxw';
+                    if (data.gender != null) {
+                        var gender = parseFloat(data.gender);
+                        vid = "xNFoxWatPsI";
+                        if (data.gender < .5)
+                            vid = 'bbQ6AZ9Jcxw';
 
-                    if (vid != _currentVideo) {
-                        updateCurrentVideo(vid);
-                        _currentVideo = vid;
+                        if (vid != _currentVideo) {
+                            updateCurrentVideo(vid);
+                            _currentVideo = vid;
+                        }
                     }
                 });
             });
