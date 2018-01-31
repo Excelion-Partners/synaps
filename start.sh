@@ -25,6 +25,13 @@ python /usr/pyNetworkConnect/python/main.py
 # postgres
 bash /usr/bash/postgres-init.sh
 
+## apache
+echo "starting apache..."
+mv /usr/apache/000-default.conf /etc/apache2/sites-available/
+sudo a2enmod proxy
+sudo a2enmod proxy_http
+systemctl start apache2.service
+
 # By default docker gives us 64MB of shared memory size but to display heavy
 # pages we need more.
 umount /dev/shm && mount -t tmpfs shm /dev/shm
