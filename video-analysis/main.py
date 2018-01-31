@@ -134,9 +134,10 @@ def main(sess,age,gender,train_mode,images_pl):
                     age_socket = np.average(ages)
                     gender_socket = np.average(genders)
 
-                    socketIO.emit('current-users',{'age': "{}".format(age_socket), 'gender': "{}".format(gender_socket), 'ct': people_in_frame})
+                    Logger.log('emitting current')
+                    socketIO.emit('current',{'age': "{}".format(age_socket), 'gender': "{}".format(gender_socket), 'ct': "{}".format(people_in_frame)})
             else:
-                socketIO.emit('current-users',{'age': -1, 'gender': -1, 'ct': 0})
+                socketIO.emit('current',{'age': -1, 'gender': -1, 'ct': 0})
                 
             check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces)
 

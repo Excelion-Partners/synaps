@@ -37,6 +37,7 @@
       width: 320px;
       height: 240px;
       position: absolute;
+      display:none;
     }
 
     #current-img {
@@ -111,7 +112,7 @@
               $('#user-div').show();
               $('#current-img').prop('src', 'data:image/png;base64,' + data.buffer);
             });
-            _socket.on('current-users', function (data) {
+            _socket.on('current', function (data) {
               console.log('new user data')
               $('#user-info').html(JSON.stringify(data));
               $('#current-img').prop('src', 'data:image/png;base64,' + data.buffer);
@@ -135,7 +136,7 @@
 
     </div>
   </div>
-  <iframe id="vid-frame" frameborder="0" src="http://localhost/rolex.html" height="100%" width="100%"></iframe>
+  <iframe id="vid-frame" frameborder="0" src="SynapsLogo.png" height="100%" width="100%"></iframe>
 </body>
 
 </html>
