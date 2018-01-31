@@ -58,7 +58,7 @@ RUN yarn install
 
 # web
 RUN mkdir /usr/apache
-COPY ./apache/000-default.conf /usr/apache
+COPY ./apache/000-default.conf /usr/apache/000-default.conf
 COPY ./web /var/www/html
 
 # bash
