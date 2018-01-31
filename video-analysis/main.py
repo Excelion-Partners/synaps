@@ -135,7 +135,7 @@ def main(sess,age,gender,train_mode,images_pl):
                     gender_socket = np.average(genders)
 
                     Logger.log('emitting current')
-                    socketIO.emit('current',{'age': "{}".format(age_socket), 'gender': "{}".format(gender_socket), 'ct': "{}".format(people_in_frame)})
+                    socketIO.emit('current',{'age': "{:10.2f}".format(int(age_socket)), 'gender': "{:10.2f}".format(gender_socket), 'ct': "{}".format(people_in_frame)})
             else:
                 socketIO.emit('current',{'age': None, 'gender': None, 'ct': 0})
                 
