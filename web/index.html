@@ -37,7 +37,12 @@
       width: 320px;
       height: 240px;
       position: absolute;
-      display:none;
+      display: none;
+      background-color: rgb(255, 255, 255, .1);
+    }
+
+    #user-info {
+      padding: 10px;
     }
 
     #current-img {
@@ -115,7 +120,6 @@
             _socket.on('current', function (data) {
               console.log('new user data')
               $('#user-info').html(JSON.stringify(data));
-              $('#current-img').prop('src', 'data:image/png;base64,' + data.buffer);
             });
           });
         });
