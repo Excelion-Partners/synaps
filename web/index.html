@@ -110,6 +110,10 @@
               $('#user-div').show();
               $('#current-img').prop('src', 'data:image/png;base64,' + data.buffer);
             });
+            _socket.on('current-users', function (data) {
+              $('#user-info').html(JSON.stringify(data));
+              $('#current-img').prop('src', 'data:image/png;base64,' + data.buffer);
+            });
           });
         });
 
@@ -125,6 +129,9 @@
 <body>
   <div id="user-div">
     <img id="current-img">
+    <div id="user-info">
+
+    </div>
   </div>
   <iframe id="vid-frame" frameborder="0" src="http://localhost/rolex.html" height="100%" width="100%"></iframe>
 </body>

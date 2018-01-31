@@ -131,10 +131,10 @@ def main(sess,age,gender,train_mode,images_pl):
 
                     last_demo = arrow.now()
 
-                    age = np.average(ages)
-                    gender = np.average(genders)
+                    age_socket = np.average(ages)
+                    gender_socket = np.average(genders)
 
-                    socketIO.emit('current-users',{'age': age, 'gender': gender, 'ct': people_in_frame})
+                    socketIO.emit('current-users',{'age': "{}".format(age_socket), 'gender': "{}".format(gender_socket), 'ct': people_in_frame})
             else:
                 socketIO.emit('current-users',{'age': -1, 'gender': -1, 'ct': 0})
                 
