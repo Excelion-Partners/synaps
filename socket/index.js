@@ -30,7 +30,7 @@ console.log('starting socket')
 io.on('connection', function (socket) {
     // _socket = socket;
 
-    console.log('connection')
+    console.log('new socket connection...')
 
     socket.emit('config', {
         device_id: uuid,
