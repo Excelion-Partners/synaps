@@ -46,14 +46,13 @@
     }
   </style>
 
-  <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
   <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 
   <!--Firebase initialization-->
   <script src="//www.gstatic.com/firebasejs/4.6.1/firebase.js"></script>
 
   <script>
-
     var firebase_config = {
       apiKey: "AIzaSyD9g3sm1t5rjpgtJlNBuRk3_ycH0CYZzGg",
       authDomain: "synaps-f7720.firebaseapp.com",
@@ -95,8 +94,10 @@
     $(document).ready(function () {
 
       function init() {
-        var src = window.location.protocol + '//' + window.location.host + '/socket.io';
-        _socket = io(src);
+        var src = window.location.protocol + '//' + window.location.host;
+        _socket = io(src, {
+          path: '/socket.io'
+        });
         _socket.on('connect', function () {
           console.log('connected')
           _socket.on('config', function (data) {
@@ -117,7 +118,7 @@
           });
         });
 
-        _socket.on('disconnect', function () { });
+        _socket.on('disconnect', function () {});
       }
 
       $('#user-div').hide();
