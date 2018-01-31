@@ -78,6 +78,9 @@ def main(sess,age,gender,train_mode,images_pl):
     last_demo = arrow.now()
     last_video = arrow.now()
 
+    age_socket = 0
+    gender_socket = -1
+
     while True:
         now = arrow.now()
 
@@ -107,7 +110,7 @@ def main(sess,age,gender,train_mode,images_pl):
             detected = detector(gray, 0)
             d_2 = float((datetime.datetime.now() - d).microseconds) / 1000000
 
-            people_in_last_frame = len(detected)
+            people_in_frame = len(detected)
             faces = np.empty((len(detected), img_size, img_size, 3))
 
             # compute the ages / genders
@@ -115,21 +118,28 @@ def main(sess,age,gender,train_mode,images_pl):
             ages = []
             genders = []
             g_2 = 0
-            if people_in_last_frame > 0 and ld > TIME_BETWEEN_DEMO:
-                
-                # align the faces
-                for i, d in enumerate(detected):
-                    faces[i, :, :, :] = fa.align(input_img, gray, detected[i])
-                
-                g = datetime.datetime.now()
-                ages,genders = sess.run([age, gender], feed_dict={images_pl: faces, train_mode: False})
-                g_2 = float((datetime.datetime.now() - g).microseconds) / 1000000
 
-                last_demo = arrow.now()
+            if people_in_frame > 0:
+                if ld > TIME_BETWEEN_DEMO:
+                    # align the faces
+                    for i, d in enumerate(detected):
+                        faces[i, :, :, :] = fa.align(input_img, gray, detected[i])
+                    
+                    g = datetime.datetime.now()
+                    ages,genders = sess.run([age, gender], feed_dict={images_pl: faces, train_mode: False})
+                    g_2 = float((datetime.datetime.now() - g).microseconds) / 1000000
+
+                    last_demo = arrow.now()
+
+                    age = np.average(ages)
+                    gender = np.average(genders)
+
+                    socketIO.emit('current-users',{'age': age, 'gender': gender, 'ct': people_in_frame})
+            else:
+                socketIO.emit('current-users',{'age': -1, 'gender': -1, 'ct': 0})
                 
             check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces)
 
-            current_usr = ''
             biggest_img = 0
 
             fd_2 = 0
@@ -194,8 +204,7 @@ def main(sess,age,gender,train_mode,images_pl):
 
                 if area > biggest_img:
                     biggest_img = area
-                    current_usr = deets
-
+                    
                 if LIVE_VIDEO:
                     # drawing the rectangle & label
                     x1, y1, x2, y2, w, h = d.left(), d.top(), d.right() + 1, d.bottom() + 1, d.width(), d.height()
@@ -207,9 +216,6 @@ def main(sess,age,gender,train_mode,images_pl):
                 if faces_tracked != len(tracked_faces):
                     Logger.log('{} tracked face'.format(len(tracked_faces)))
                     faces_tracked = len(tracked_faces)
-
-                # if not LOCAL_MODE and LIVE_VIDEO:
-                #     socketIO.emit('current-user',{'details': current_usr})
 
             if LOCAL_MODE:
                 win.set_image(img)
