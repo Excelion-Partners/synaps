@@ -95,7 +95,7 @@
     $(document).ready(function () {
 
       function init() {
-        var src = window.location.protocol + '//' + window.location.host + ':3001';
+        var src = window.location.protocol + '//' + window.location.host + '/socket.io';
         _socket = io(src);
         _socket.on('connect', function () {
           console.log('connected')
