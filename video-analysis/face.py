@@ -67,11 +67,14 @@ class Face:
     def sex(self):
         sx = self.gender()
 
+        if sx == 0:
+            return '--'
+
         return 'Male' if sx > .5 else 'Female'
 
     def gender(self):
         if len(self.sexes) < 4:
-            return '--'
+            return 0
 
         skip = int(math.floor(float(len(self.sexes)) / 4))
         sx = np.mean(sorted(self.sexes)[skip:(skip * 2)])
