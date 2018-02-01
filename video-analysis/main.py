@@ -302,6 +302,7 @@ def check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces):
 
 
 def load_network(model_path):
+    # https://github.com/BoyuanJiang/Age-Gender-Estimate-TF
     sess = tf.Session()
     images_pl = tf.placeholder(tf.float32, shape=[None, 160, 160, 3], name='input_image')
     images_norm = tf.map_fn(lambda frame: tf.image.per_image_standardization(frame), images_pl)
