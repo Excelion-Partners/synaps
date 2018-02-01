@@ -65,13 +65,18 @@ class Face:
         self.sexes.append(sex)
 
     def sex(self):
+        sx = self.gender()
+
+        return 'Male' if sx > .5 else 'Female'
+
+    def gender(self):
         if len(self.sexes) < 4:
             return '--'
 
         skip = int(math.floor(float(len(self.sexes)) / 4))
-        sx = np.mean(sorted(self.sexes)[skip:(skip*2)])
+        sx = np.mean(sorted(self.sexes)[skip:(skip * 2)])
 
-        return 'Male' if sx > .5 else 'Female'
+        return sx
 
     def age(self):
         if len(self.ages) < 4:
