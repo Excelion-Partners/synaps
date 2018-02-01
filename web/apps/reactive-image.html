@@ -95,7 +95,7 @@
 
 <body>
     <div id="img-div">
-        <img id="ad-img" />
+        <img id="ad-img" src="reactive-image/SynapsLogo.png" />
     </div>
     <script>
         var _socket;
@@ -119,6 +119,7 @@
         function init() {
             var _socket;
             var _currentImage = '';
+            var _lastUpdate = (new Date).getTime() / 1000;
 
             function initSocket() {
                 var src = window.location.protocol + '//' + window.location.host;
@@ -147,7 +148,9 @@
                                 }
                             }
 
-                            if (_currentImage != img) {
+                            var tm = (new Date).getTime() / 1000;
+                            if (_currentImage != img && ((tm - _lastUpdate) > 60)) {
+                                _lastUpdate = tm;
                                 _currentImage = img
                                 swapImage(img);
                             }
