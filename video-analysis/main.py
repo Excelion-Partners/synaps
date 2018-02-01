@@ -35,7 +35,7 @@ def draw_label(image, point, label, font=cv2.FONT_HERSHEY_SIMPLEX,
 def main(sess, age, gender, train_mode, images_pl):
     LOCAL_MODE = os.getenv('LOCAL_MODE', 'True') == 'True'
     TIME_BETWEEN_READS = float(os.getenv('TIME_BETWEEN_READS', .1))
-    TIME_BETWEEN_DEMO = float(os.getenv('TIME_BETWEEN_DEMO', .5))
+    TIME_BETWEEN_DEMO = float(os.getenv('TIME_BETWEEN_DEMO', .25))
     TIME_BETWEEN_VIDEO = float(os.getenv('TIME_BETWEEN_DEMO', .8))
 
     LIVE_VIDEO = os.getenv('LIVE_VIDEO', 'True') == 'True'
