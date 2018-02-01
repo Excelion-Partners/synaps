@@ -4,10 +4,12 @@ from random import randint
 import arrow
 import threading
 import boto3
+import math
 
 from face_session import FaceSession
 from logger import Logger
 from storage import Storage
+import numpy as np
 
 USER_SESSION_TIMEOUT_SECONDS = 6
 MIN_SESSION_LENGTH = 2
@@ -21,10 +23,8 @@ class Face:
         self.sessions = []
 
         self.storage = Storage()
-        self.age_tot = 0
-        self.age_ct = 0
-        self.sex_tot = 0
-        self.sex_ct = 0
+        self.sexes = []
+        self.ages = []
         self.largest_img = 0
      
         self.appendNewSession()
@@ -59,25 +59,28 @@ class Face:
         self.currentSession().lastSeen = arrow.now()
 
     def add_age(self, age):
-        self.age_tot += age
-        self.age_ct += 1
+        self.ages.append(age)
 
     def add_sex(self, sex):
-        self.sex_tot += sex
-        self.sex_ct += 1
+        self.sexes.append(sex)
 
     def sex(self):
-        if (self.sex_ct == 0):
+        if len(self.sexes) < 4:
             return '--'
 
-        sx = float(self.sex_tot) / float(self.sex_ct)
+        skip = int(math.floor(float(len(self.sexes)) / 4))
+        sx = np.mean(sorted(self.sexes)[skip:(skip*2)])
+
         return 'Male' if sx > .5 else 'Female'
 
     def age(self):
-        if self.age_ct == 0:
+        if len(self.ages) < 4:
             return 0
 
-        age = float(self.age_tot) / float(self.age_ct)
+        skip = int(math.floor(float(len(self.ages)) / 4))
+
+        age = np.mean(sorted(self.ages)[skip:(skip*2)])
+
         return age
 
     def detailStr(self):
