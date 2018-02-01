@@ -18,7 +18,6 @@ class ViewerStatus:
             self.last_viewer_ct = ct
             self.viewer_ct = ct
 
-            Logger.log('viewer count dirty')
             self.dirty = True
 
     def set_viewer_avg_demos(self, age, gender):
@@ -26,7 +25,6 @@ class ViewerStatus:
             self.avg_age = age
             self.avg_gender = gender
 
-            Logger.log('avg dirty')
             self.dirty = True
 
     def set_viewer_demos(self, age, gender):
@@ -34,5 +32,4 @@ class ViewerStatus:
             self.closest_age = age
             self.closest_gender = gender
 
-            Logger.log('demos dirty')
             self.dirty = True

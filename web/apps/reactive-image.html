@@ -70,6 +70,11 @@
         .carousel.fade .item.active {
             opacity: 1;
         }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
     </style>
 
     <!--Firebase initialization-->
@@ -104,6 +109,13 @@
             _device_id = data.device_id;
         }
 
+        function swapImage(newImg) {
+            $('#ad-img').fadeOut(400, function () {
+                $('#ad-img').attr('src', 'reactive-image/' + newImg);
+                $('#ad-img').fadeIn();
+            })
+        }
+
         function init() {
             var _socket;
             var _currentImage = '';
@@ -135,7 +147,7 @@
                                 }
                             }
 
-                            $('#ad-img').attr('src', 'reactive-image/' + img);
+                            swapImage(img);
                         }
                     });
                 });
