@@ -147,7 +147,10 @@
                                 }
                             }
 
-                            swapImage(img);
+                            if (_currentImage != img) {
+                                _currentImage = img
+                                swapImage(img);
+                            }
                         }
                     });
                 });
