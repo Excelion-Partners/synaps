@@ -115,7 +115,7 @@
               $('#user-div').show();
               $('#current-img').prop('src', 'data:image/png;base64,' + data.buffer);
             });
-            _socket.on('current', function (data) {
+            _socket.on('user-update', function (data) {
               console.log('new user data')
               $('#user-info').html(JSON.stringify(data));
             });
