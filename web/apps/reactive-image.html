@@ -116,10 +116,14 @@
             })
         }
 
+        function getSecondsSinceEpoch() {
+            return Math.round((new Date).getTime() / 1000);
+        }
+
         function init() {
             var _socket;
             var _currentImage = '';
-            var _lastUpdate = (new Date).getTime() / 1000;
+            var _lastUpdate = getSecondsSinceEpoch();
 
             function initSocket() {
                 var src = window.location.protocol + '//' + window.location.host;
@@ -148,8 +152,8 @@
                                 }
                             }
 
-                            var tm = (new Date).getTime() / 1000;
-                            if (_currentImage != img && ((tm - _lastUpdate) > 60)) {
+                            var tm = getSecondsSinceEpoch();
+                            if (_currentImage != img && ((tm - _lastUpdate) >= 6)) {
                                 _lastUpdate = tm;
                                 _currentImage = img
                                 swapImage(img);
