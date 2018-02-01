@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Synaps Demo | Client</title>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+    <!--Firebase initialization-->
+    <script src="//www.gstatic.com/firebasejs/4.6.1/firebase.js"></script>
+
+    <style type="text/css">
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        #videoIframeCenter {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            border: none;
+        }
+
+        .flip-horizontal {
+            -moz-transform: scaleX(-1);
+            -o-transform: scaleX(-1);
+            -webkit-transform: scaleX(-1);
+            transform: scaleX(-1);
+            filter: FlipH;
+            -ms-filter: "FlipH";
+        }
+
+        .carousel.fade {
+            opacity: 1;
+        }
+
+        .carousel.fade .item {
+            transition: opacity ease-out .7s;
+            left: 0;
+            opacity: 0;
+            /* hide all slides */
+            top: 0;
+            position: absolute;
+            width: 100%;
+            display: block;
+        }
+
+        .carousel.fade .item:first-child {
+            top: auto;
+            opacity: 1;
+            /* show first slide */
+            position: relative;
+        }
+
+        .carousel.fade .item.active {
+            opacity: 1;
+        }
+    </style>
+
+    <!--Firebase initialization-->
+    <script src="//www.gstatic.com/firebasejs/4.6.1/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyAIT15tnE-1kYdkpo-5Sum1LepfPS2RX34",
+            authDomain: "synaps-demo.firebaseapp.com",
+            databaseURL: "https://synaps-demo.firebaseio.com/",
+            projectId: "synaps-demo",
+            storageBucket: "synaps-demo.appspot.com",
+            messagingSenderId: "418060779748"
+        };
+        firebase.initializeApp(config);
+    </script>
+</head>
+
+<body>
+    <div id="img-div">
+        <img id="ad-img" />
+    </div>
+    <script>
+        var _socket;
+        var _flip;
+        var _customer_id;
+        var _device_id;
+
+        function applyConfig(data) {
+            _flip = data.flip;
+            _customer_id = data.customer_id;
+            _device_id = data.device_id;
+        }
+
+        function init() {
+            var _socket;
+            var _currentImage = '';
+
+            function initSocket() {
+                var src = window.location.protocol + '//' + window.location.host;
+                _socket = io(src, {
+                    path: '/socket.io'
+                });
+                _socket.on('connect', function () {
+                    console.log('connected')
+
+                    _socket.on('user-update', function (data) {
+                        var gender = parseFloat(data["closest-gender"]);
+                        var age = parseFloat(data["closest-age"])
+                        if (age != 0) {
+                            var img = "bicardi.jpg";
+                            if (gender > .5) {
+                                // male
+                                if (age >= 45) {
+                                    img = "jw.jpg";
+                                } else {
+                                    img = "jd.jpg";
+                                }
+                            } else {
+                                // female
+                                if (age >= 45) {
+                                    img = 'greygoose.jpg';
+                                }
+                            }
+
+                            $('#ad-img').attr('src', img);
+                        }
+                    });
+                });
+
+                _socket.on('disconnect', function () {});
+            }
+
+            initSocket();
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

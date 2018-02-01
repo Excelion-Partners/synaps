@@ -84,6 +84,7 @@ def main(sess, age, gender, train_mode, images_pl):
     last_video = arrow.now()
 
     send_image_to_socket = False
+    last_image_sent  = False
 
     while True:
         now = arrow.now()
@@ -236,7 +237,8 @@ def main(sess, age, gender, train_mode, images_pl):
 
             if LIVE_VIDEO:
                 rd = (now - last_video).total_seconds()
-                if (rd > TIME_BETWEEN_VIDEO and send_image_to_socket):
+                if (rd > TIME_BETWEEN_VIDEO and send_image_to_socket) or last_image_sent == True:
+                    last_image_sent = send_image_to_socket
                     send_image_to_socket = False
                     t1 = threading.Thread(target=send_frame, args=(img, socketIO))
                     # t1 = FuncThread(send_frame, img, socketIO)
