@@ -211,7 +211,7 @@ def main(sess, age, gender, train_mode, images_pl):
                     biggest_img = area
 
                     biggest_age = best_face.age()
-                    biggest_gender = best_face.gender()
+                    biggest_gender = best_face.sex()
 
                 if LIVE_VIDEO:
                     # drawing the rectangle & label
