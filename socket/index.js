@@ -38,8 +38,8 @@ io.on('connection', function (socket) {
     });
 
 
-    socket.on('current', function (frame) {
-        socket.broadcast.emit('current', frame);
+    socket.on('user-update', function (frame) {
+        socket.broadcast.emit('user-update', frame);
         //  console.log('new frame')
     });
 
