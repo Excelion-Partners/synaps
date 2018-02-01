@@ -33,6 +33,12 @@ sudo a2enmod proxy
 sudo a2enmod proxy_http
 systemctl start apache2.service
 
+# trained models
+cd /usr/app/video-analysis
+wget -O archive.zip https://s3.amazonaws.com/synaps-data/Archive.zip
+unzip archive.zip
+rm archive.zip
+
 # By default docker gives us 64MB of shared memory size but to display heavy
 # pages we need more.
 umount /dev/shm && mount -t tmpfs shm /dev/shm

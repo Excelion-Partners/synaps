@@ -38,9 +38,6 @@ RUN npm install -g yarn
 # tensorflow / dlib models
 RUN mkdir /usr/app/video-analysis
 WORKDIR /usr/app/video-analysis
-RUN wget -O archive.zip https://s3.amazonaws.com/synaps-data/Archive.zip
-RUN unzip archive.zip
-RUN rm archive.zip
 COPY ./video-analysis .
 
 # socket
