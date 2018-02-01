@@ -133,10 +133,13 @@ def main(sess, age, gender, train_mode, images_pl):
 
                     last_demo = arrow.now()
 
-                    viewer_status.avg_age = np.average(ages)
-                    viewer_status.avg_gender = np.average(genders)
+                    viewer_status.set_viewer_avg_demos(np.average(ages), np.average(genders))
             else:
-                emit_user_update(socketIO)
+                viewer_status.set_viewer_demos(None, None)
+                viewer_status.set_viewer_avg_demos(None, None)
+                viewer_status.set_viewer_ct(0)
+
+                emit_user_update(socketIO, viewer_status)
 
             check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces)
 
@@ -258,9 +261,9 @@ def main(sess, age, gender, train_mode, images_pl):
 
 
 def emit_user_update(socketIO, viewer_status):
-
     if viewer_status.dirty == True:
-        socketIO.emit('user-update', {'avg-age': "{:10.2f}".format(viewer_status.avg_age), 'avg-gender': "{:10.2f}".format(viewer_status.avg_gender),
+        socketIO.emit('user-update', {'avg-age': "{:10.2f}".format(viewer_status.avg_age),
+                                      'avg-gender': "{:10.2f}".format(viewer_status.avg_gender),
                                       'viewer-ct': viewer_status.viewer_ct,
                                       'closest-age': "{:10.2f}".format(viewer_status.closest_age),
                                       'closest-gender': "{:10.2f}".format(viewer_status.closest_gender)

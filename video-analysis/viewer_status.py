@@ -13,9 +13,16 @@ class ViewerStatus:
     def set_viewer_ct(self, ct):
         if ct != self.last_viewer_ct:
             self.last_viewer_ct = self.viewer_ct
+            self.viewer_ct = ct
+
             self.dirty = True
 
-        self.viewer_ct = ct
+    def set_viewer_avg_demos(self, age, gender):
+        if self.avg_age != age:
+            self.avg_age = age
+            self.avg_gender = gender
+
+            self.dirty = True
 
     def set_viewer_demos(self, age, gender):
         if self.closest_age != age or self.closest_gender != gender:
