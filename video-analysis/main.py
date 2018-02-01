@@ -196,6 +196,7 @@ def main(sess, age, gender, train_mode, images_pl):
 
                 if not found:
                     newFace = Face(face_descriptor)
+                    best_face = newFace
                     tracked_faces.append(newFace)
 
                     if len(ages) > 0:
@@ -209,7 +210,7 @@ def main(sess, age, gender, train_mode, images_pl):
                 if area > biggest_img:
                     biggest_img = area
 
-                    if len(ages) > 0:
+                    if len(ages) > 0 and best_face.age_ct>2:
                         biggest_age = int(ages[d_ct])
                         biggest_gender = int(genders[d_ct])
 
