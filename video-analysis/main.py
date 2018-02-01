@@ -83,6 +83,8 @@ def main(sess, age, gender, train_mode, images_pl):
     last_demo = arrow.now()
     last_video = arrow.now()
 
+    send_image_to_socket = False
+
     while True:
         now = arrow.now()
 
@@ -135,11 +137,9 @@ def main(sess, age, gender, train_mode, images_pl):
 
                     viewer_status.set_viewer_avg_demos(np.average(ages), np.average(genders))
             else:
-                viewer_status.set_viewer_demos(None, None)
-                viewer_status.set_viewer_avg_demos(None, None)
+                viewer_status.set_viewer_demos(0, 0)
+                viewer_status.set_viewer_avg_demos(0, 0)
                 viewer_status.set_viewer_ct(0)
-
-                emit_user_update(socketIO, viewer_status)
 
             check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces)
 
@@ -224,15 +224,20 @@ def main(sess, age, gender, train_mode, images_pl):
                     Logger.log('{} tracked face'.format(len(tracked_faces)))
                     faces_tracked = len(tracked_faces)
 
-            if biggest_age != -1:
+            if biggest_age > -1:
                 viewer_status.set_viewer_demos(biggest_age, biggest_gender)
+
+            if viewer_status.dirty == True:
+                send_image_to_socket = True
                 emit_user_update(socketIO, viewer_status)
 
-            if LOCAL_MODE:
+            if LOCAL_MODE and send_image_to_socket:
                 win.set_image(img)
+
             if LIVE_VIDEO:
                 rd = (now - last_video).total_seconds()
-                if (rd > TIME_BETWEEN_VIDEO):
+                if (rd > TIME_BETWEEN_VIDEO and send_image_to_socket):
+                    send_image_to_socket = False
                     t1 = threading.Thread(target=send_frame, args=(img, socketIO))
                     # t1 = FuncThread(send_frame, img, socketIO)
                     t1.start()

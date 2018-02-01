@@ -29,8 +29,7 @@ const io = require('socket.io')(3001, {
 console.log('starting socket')
 io.on('connection', function (socket) {
     // _socket = socket;
-
-    console.log('new socket connection...')
+    // console.log('new socket connection...')
 
     socket.emit('config', {
         device_id: uuid,

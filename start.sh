@@ -48,6 +48,7 @@ if [ $DASHBOARD = "1" ];
 then
     # dashboard
     cd /usr/app/dashboard/
+    yarn install 
     # --enable-logging 
     yarn start & echo "starting socket" & cd /usr/app/socket/ && node index.js & sleep 30s & echo "starting electron" & startx /usr/app/electron/node_modules/electron/dist/electron /usr/app/electron & cd /usr/app/video-analysis && python3 main.py 
     # yarn start & sleep 5s && startx /usr/app/electron/node_modules/electron/dist/electron /usr/app/electron --enable-logging & cd /usr/app/socket/ && node index.js & sleep 1s & cd /usr/app/video-analysis && python3 main.py 
