@@ -142,7 +142,7 @@
 
                 _socket.on('current', function (data) {
                     if (data.gender != null) {
-                        var gender = parseFloat(data.gender);
+                        var gender = parseFloat(data.closest-gender);
                         vid = "xNFoxWatPsI";
                         if (data.gender < .5)
                             vid = 'bbQ6AZ9Jcxw';

@@ -21,6 +21,8 @@ from logger import Logger
 from face_session import FaceSession
 from face import Face
 from storage import Storage
+from viewer_status import ViewerStatus
+
 
 def draw_label(image, point, label, font=cv2.FONT_HERSHEY_SIMPLEX,
                font_scale=1, thickness=2):
@@ -29,13 +31,14 @@ def draw_label(image, point, label, font=cv2.FONT_HERSHEY_SIMPLEX,
     cv2.rectangle(image, (x, y - size[1]), (x + size[0], y), (255, 0, 0), cv2.FILLED)
     cv2.putText(image, label, point, font, font_scale, (255, 255, 255), thickness)
 
-def main(sess,age,gender,train_mode,images_pl):
+
+def main(sess, age, gender, train_mode, images_pl):
     LOCAL_MODE = os.getenv('LOCAL_MODE', 'True') == 'True'
     TIME_BETWEEN_READS = float(os.getenv('TIME_BETWEEN_READS', .1))
     TIME_BETWEEN_DEMO = float(os.getenv('TIME_BETWEEN_DEMO', .5))
     TIME_BETWEEN_VIDEO = float(os.getenv('TIME_BETWEEN_DEMO', .8))
 
-    LIVE_VIDEO =  os.getenv('LIVE_VIDEO', 'True') == 'True'
+    LIVE_VIDEO = os.getenv('LIVE_VIDEO', 'True') == 'True'
     REMOVE_USER_TIMEOUT_SECONDS = int(
         os.getenv('REMOVE_USER_TIMEOUT_SECONDS', 60))  # seconds
     FACE_MATCH = .5
@@ -74,19 +77,18 @@ def main(sess,age,gender,train_mode,images_pl):
     faces_tracked = -1
     tracked_faces = []
 
+    viewer_status = ViewerStatus()
+
     last_read = arrow.now()
     last_demo = arrow.now()
     last_video = arrow.now()
-
-    age_socket = 0
-    gender_socket = -1
 
     while True:
         now = arrow.now()
 
         rd = (now - last_read).total_seconds()
         if (rd > TIME_BETWEEN_READS):
-            
+
             t = time.time()
 
             last_read = arrow.now()
@@ -96,8 +98,8 @@ def main(sess,age,gender,train_mode,images_pl):
                 print("error: failed to capture image")
                 return -1
 
-            #img = imutils.resize(img, width=MAX_FRAME_WIDTH)
-            #img = cv2.flip(img, 1)
+            # img = imutils.resize(img, width=MAX_FRAME_WIDTH)
+            # img = cv2.flip(img, 1)
 
             input_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -110,7 +112,7 @@ def main(sess,age,gender,train_mode,images_pl):
             detected = detector(gray, 0)
             d_2 = float((datetime.datetime.now() - d).microseconds) / 1000000
 
-            people_in_frame = len(detected)
+            viewer_status.set_viewer_ct(len(detected))
             faces = np.empty((len(detected), img_size, img_size, 3))
 
             # compute the ages / genders
@@ -119,37 +121,34 @@ def main(sess,age,gender,train_mode,images_pl):
             genders = []
             g_2 = 0
 
-            if people_in_frame > 0:
+            if viewer_status.viewer_ct > 0:
                 if ld > TIME_BETWEEN_DEMO:
                     # align the faces
                     for i, d in enumerate(detected):
                         faces[i, :, :, :] = fa.align(input_img, gray, detected[i])
-                    
+
                     g = datetime.datetime.now()
-                    ages,genders = sess.run([age, gender], feed_dict={images_pl: faces, train_mode: False})
+                    ages, genders = sess.run([age, gender], feed_dict={images_pl: faces, train_mode: False})
                     g_2 = float((datetime.datetime.now() - g).microseconds) / 1000000
 
                     last_demo = arrow.now()
 
-                    age_socket = np.average(ages)
-                    gender_socket = np.average(genders)
-
-                    Logger.log('emitting current')
-                    socketIO.emit('current',{'age': "{:10.2f}".format(int(age_socket)), 'gender': "{:10.2f}".format(gender_socket), 'ct': "{}".format(people_in_frame)})
+                    viewer_status.avg_age = np.average(ages)
+                    viewer_status.avg_gender = np.average(genders)
             else:
-                socketIO.emit('current',{'age': None, 'gender': None, 'ct': 0})
-                
+                emit_user_update(socketIO)
+
             check_session_timeout(REMOVE_USER_TIMEOUT_SECONDS, now, tracked_faces)
 
             biggest_img = 0
+            biggest_gender = -1
+            biggest_age = -1
 
             fd_2 = 0
-            #tmp = imutils.resize(img, width=640)
-
             d_ct = 0
             for k, d in enumerate(detected):
 
-                if (len(ages)>0):
+                if (len(ages) > 0):
                     Logger.log("age: {}".format(int(ages[d_ct])))
 
                 shape = predictor(img, d)
@@ -168,7 +167,7 @@ def main(sess,age,gender,train_mode,images_pl):
                     dst = distance.euclidean(face_descriptor, face.descriptor)
 
                     # Logger.log("age: {0}, gender:{1}".format(ages[i], genders[i]))
-                    if dst < FACE_MATCH and dst<best_match:
+                    if dst < FACE_MATCH and dst < best_match:
                         # Logger.log("match {}: {}".format(t, dst))
                         best_match = dst
                         best_face = face
@@ -205,7 +204,11 @@ def main(sess,age,gender,train_mode,images_pl):
 
                 if area > biggest_img:
                     biggest_img = area
-                    
+
+                    if len(ages) > 0:
+                        biggest_age = int(ages[d_ct])
+                        biggest_gender = int(genders[d_ct])
+
                 if LIVE_VIDEO:
                     # drawing the rectangle & label
                     x1, y1, x2, y2, w, h = d.left(), d.top(), d.right() + 1, d.bottom() + 1, d.width(), d.height()
@@ -218,6 +221,10 @@ def main(sess,age,gender,train_mode,images_pl):
                     Logger.log('{} tracked face'.format(len(tracked_faces)))
                     faces_tracked = len(tracked_faces)
 
+            if biggest_age != -1:
+                viewer_status.set_viewer_demos(biggest_age, biggest_gender)
+                emit_user_update(socketIO, viewer_status)
+
             if LOCAL_MODE:
                 win.set_image(img)
             if LIVE_VIDEO:
@@ -229,8 +236,8 @@ def main(sess,age,gender,train_mode,images_pl):
                     t1.join()
 
                     last_video = arrow.now()
-            
-            t_2 = time.time()-t
+
+            t_2 = time.time() - t
 
             if fd_2 > 0:
                 Logger.log('total {0}s | detector {1}s | gender {2}s | descriptor {3}s '.format(t_2, d_2, g_2, fd_2))
@@ -248,6 +255,19 @@ def main(sess,age,gender,train_mode,images_pl):
             #
             #         if r is not False:
             #             storage.updateSessionSyncStatus(unsyncd)
+
+
+def emit_user_update(socketIO, viewer_status):
+
+    if viewer_status.dirty == True:
+        socketIO.emit('user-update', {'avg-age': "{:10.2f}".format(viewer_status.avg_age), 'avg-gender': "{:10.2f}".format(viewer_status.avg_gender),
+                                      'viewer-ct': viewer_status.viewer_ct,
+                                      'closest-age': "{:10.2f}".format(viewer_status.closest_age),
+                                      'closest-gender': "{:10.2f}".format(viewer_status.closest_gender)
+                                      })
+
+        Logger.log('emitting new user status')
+        viewer_status.dirty = False
 
 
 def send_frame(img, socketIO):
@@ -292,8 +312,9 @@ def load_network(model_path):
         print("restore model!")
     else:
         pass
-    return sess,age,gender,train_mode,images_pl
+    return sess, age, gender, train_mode, images_pl
+
 
 if __name__ == '__main__':
-    sess, age, gender, train_mode,images_pl = load_network("./models")
-    main(sess,age,gender,train_mode,images_pl)
+    sess, age, gender, train_mode, images_pl = load_network("./models")
+    main(sess, age, gender, train_mode, images_pl)
