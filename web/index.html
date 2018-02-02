@@ -98,7 +98,8 @@
     $(document).ready(function () {
 
       function init() {
-        var src = window.location.protocol + '//' + window.location.host;
+       // var src = window.location.protocol + '//' + window.location.host;
+       var src= "http://localhost"
         _socket = io(src, {
           path: '/socket.io'
         });
