@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Synaps Demo | Controller</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+
+    <!--Firebase initialization-->
+    <script src="https://www.gstatic.com/firebasejs/4.6.1/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyBB-xkCwhxv_dwPsU5KrETBVn5EgkT6qAE",
+            authDomain: "artco-demo.firebaseapp.com",
+            databaseURL: "https://artco-demo.firebaseio.com",
+            projectId: "artco-demo",
+            storageBucket: "artco-demo.appspot.com",
+            messagingSenderId: "418060779748"
+        };
+        firebase.initializeApp(config);
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container-fluid">
+        <h1>Synaps Demo</h1>
+        <div class="row">
+            <div class="col" style="padding-bottom: 10px;">
+                <span class="align-middle" style="font-weight: bold;">Now playing: </span><span id="nowPlaying" class="align-middle">None</span>
+                <button id="stopPlayback" type="button" class="btn btn-danger float-right" onclick="setCurrentVideo(null, null)">Stop Playback</button>
+            </div>
+        </div>
+
+        <div class="card-deck-wrapper">
+            <div id="cardContainer" class="card-deck">
+            </div>
+        </div>
+    </div>
+
+    <template id="cardTemplate">
+        <div id="card-{{name}}" class="card" style="min-width: 20em; max-width: 20em; margin-bottom: 2em;">
+            <img class="card-img-top" style="height: 180px;" src="https://s3.amazonaws.com/artco-demo/thumbs/{{imageName}}" alt="{{name}}">
+            <div class="card-body">
+                <h4 class="card-title">{{displayName}}</h4>
+                <p class="card-text">{{description}}</p>
+            </div>
+            <div class="card-footer text-center bg-transparent border-0">
+                <button class="btn btn-primary" onclick="setCurrentVideo('{{videoId}}', '{{displayName}}')">Play video</button>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        var href = window.location.href;
+        var sidesQsParamLoc = href.indexOf("sides=");
+        var defaultNumOfSides = 1;
+        var sides = sidesQsParamLoc === -1 ? defaultNumOfSides : href.substring(sidesQsParamLoc + 6, sidesQsParamLoc + 7) * 1;
+        console.log("Set to " + sides + " sides.");
+
+        var currentVideoFbPath;
+        var contentFbPath;
+        if (sides === 1) {
+            currentVideoFbPath = "currentVideo";
+            contentFbPath = "content";
+        } else {
+            currentVideoFbPath = "currentThreeSidedVideo";
+            contentFbPath = "threeSidedContent";
+        }
+
+        function setCurrentVideo(videoId, videoName) {
+            var data = {
+                "videoId": videoId,
+                "name": videoName
+            };
+
+            console.log("Setting '" + currentVideoFbPath + "' field in Firebase to '" + JSON.stringify(data) + "'.");
+            firebase.database().ref(currentVideoFbPath).set(data);
+            console.log("Set '" + currentVideoFbPath + "' value in Firebase.");
+        }
+
+        function buildCards(data) {
+            var cardContainer = document.getElementById("cardContainer");
+
+            // Remove existing cards
+            while (cardContainer.firstChild) {
+                cardContainer.removeChild(cardContainer.firstChild);
+            }
+
+            var template = document.querySelector("#cardTemplate");
+            var templateHtml = template.innerHTML;
+
+            for (i = 0; i < data.length; i++) {
+                var cardData = data[i];
+                if (cardData.visible !== true) {
+                    // Must be explicitly set to true
+                    continue;
+                }
+                
+                var html = templateHtml;
+                html = html.replace(/{{name}}/g, cardData.name);
+                html = html.replace(/{{displayName}}/g, cardData.displayName);
+                html = html.replace(/{{imageName}}/g, cardData.imageName);
+                html = html.replace(/{{description}}/g, cardData.description);
+                html = html.replace(/{{videoId}}/g, cardData.videoId);
+                template.innerHTML = html;
+
+                var clone = document.importNode(template.content, true);
+                cardContainer.appendChild(clone);
+            }
+
+            // Restore the original HTML to the template (I'm sure there's a better way to do this... likely with a JS framework)
+            template.innerHTML = templateHtml;
+        }
+
+        var firebaseContent = firebase.database().ref(contentFbPath);
+        firebaseContent.on("value", function(snapshot) {
+            var data = snapshot.val();
+            if (data == null) {
+                throw new Exception("Retrieved no content data from Firebase.");
+            }
+            
+            buildCards(data.sort(sortByDisplayName));
+        });
+
+        function sortByDisplayName(a, b) {
+            var x = a.displayName.toLowerCase();
+            var y = b.displayName.toLowerCase();
+            if (x < y) { return -1; }
+            if (x > y) { return 1; }
+            return 0;
+        }
+
+        var currentVideoFirebaseRef = firebase.database().ref(currentVideoFbPath);
+        currentVideoFirebaseRef.on("value", function (snapshot) {
+            var videoData = snapshot.val();
+            if (videoData == null) {
+                $("#stopPlayback").attr("disabled", true);
+                $("#nowPlaying").text("None");
+            } else {
+                $("#stopPlayback").attr("disabled", false);
+                $("#nowPlaying").text(videoData.name);
+            }
+        });
+    </script>
+ </body>
+</html>
