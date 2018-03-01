@@ -98,12 +98,7 @@
 
     <script>
         var href = window.location.href;
-        // var sidesQsParamLoc = href.indexOf("sides=");
-        // var defaultNumOfSides = 1;
-        // var sides = sidesQsParamLoc === -1 ? defaultNumOfSides : href.substring(sidesQsParamLoc + 6, sidesQsParamLoc +
-        //     7) * 1;
-        // console.log("Set to " + sides + " sides.");
-
+      
         var _socket;
         var _flip;
         var _customer_id;
@@ -160,7 +155,7 @@
         }
 
         function initSocket() {
-            var src = window.location.protocol + '//' + window.location.host;
+            // var src = window.location.protocol + '//' + window.location.host;
             var src = "http://localhost:3001";
             _socket = io(src, {
                 path: '/socket.io'
