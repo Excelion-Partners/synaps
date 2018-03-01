@@ -113,6 +113,7 @@
         }
 
         function init() {
+            initSocket();
             _socket.on('connect', function () {
                 console.log('connected')
                 _socket.on('config', function (data) {
@@ -153,36 +154,14 @@
 
         init();
 
-        // var _socket;
-        // var _currentVideo = '';
+        function initSocket() {
+            var src = window.location.protocol + '//' + window.location.host;
+            _socket = io(src, {
+                path: '/socket.io'
+            });
 
-        // function initSocket() {
-        //     var src = window.location.protocol + '//' + window.location.host;
-        //     _socket = io(src, {
-        //         path: '/socket.io'
-        //     });
-        //     _socket.on('connect', function () {
-        //         console.log('connected')
-
-        //         _socket.on('current', function (data) {
-        //             if (data.gender != null) {
-        //                 var gender = parseFloat(data.closest - gender);
-        //                 vid = "xNFoxWatPsI";
-        //                 if (data.gender < .5)
-        //                     vid = 'bbQ6AZ9Jcxw';
-
-        //                 if (vid != _currentVideo) {
-        //                     updateCurrentVideo(vid);
-        //                     _currentVideo = vid;
-        //                 }
-        //             }
-        //         });
-        //     });
-
-        //     _socket.on('disconnect', function () {});
-        // }
-
-        // initSocket();
+            _socket.on('disconnect', function () {});
+        }
     </script>
 </body>
 
