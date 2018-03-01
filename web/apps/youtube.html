@@ -127,7 +127,7 @@
         }
 
         function init_firebase() {
-            var fbPath = _customer_id + "/" + _device_id + "properties";
+            var fbPath = _customer_id + "/" + _device_id + "/properties";
 
             // For more information on configuring the YouTube player, see https://developers.google.com/youtube/player_parameters?playerVersion=HTML5.
             var youTubeVideoUrlTemplate =
@@ -145,7 +145,7 @@
                 var videoData = snapshot.val();
 
                 var playlist = videoData.playlist;
-                var videoId = playlist[videoData.current - content];
+                var videoId = playlist[0]; // needs to cycle someday
 
                 updateCurrentVideo(videoId);
             });
