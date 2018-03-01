@@ -70,6 +70,9 @@
         .carousel.fade .item.active {
             opacity: 1;
         }
+        #log {
+            color:white;
+        }
     </style>
 
     <!--Firebase initialization-->
@@ -128,13 +131,13 @@
 
                     });
                 });
-            } catch (e) {
-                $('#log').html(JSON.stringify(e))
+            } catch (err) {
+                $('#log').html(JSON.stringify(err))
             }
         }
 
         function init_firebase() {
-            var fbPath = _customer_id + "/" + _device_id + "/properties";
+            var fbPath = "customers" + "/" + _customer_id + "/" + _device_id + "/properties";
 
             // For more information on configuring the YouTube player, see https://developers.google.com/youtube/player_parameters?playerVersion=HTML5.
             var youTubeVideoUrlTemplate =
