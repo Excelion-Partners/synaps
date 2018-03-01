@@ -80,11 +80,11 @@
     <script>
         // Initialize Firebase
         var config = {
-            apiKey: "AIzaSyAIT15tnE-1kYdkpo-5Sum1LepfPS2RX34",
-            authDomain: "synaps-demo.firebaseapp.com",
-            databaseURL: "https://synaps-demo.firebaseio.com/",
-            projectId: "synaps-demo",
-            storageBucket: "synaps-demo.appspot.com",
+            apiKey: "AIzaSyD9g3sm1t5rjpgtJlNBuRk3_ycH0CYZzGg",
+            authDomain: "synaps-f7720.firebaseapp.com",
+            databaseURL: "https://synaps-f7720.firebaseio.com/",
+            projectId: "synaps-f7720",
+            storageBucket: "synaps-f7720.appspot.com",
             messagingSenderId: "418060779748"
         };
         firebase.initializeApp(config);
@@ -130,7 +130,7 @@
         }
 
         function init_firebase() {
-            var fbPath = "customers" + "/" + _customer_id + "/" + _device_id + "/properties";
+            var fbPath = "customers/" + _customer_id + "/devices/" + _device_id + "/properties";
 
             // For more information on configuring the YouTube player, see https://developers.google.com/youtube/player_parameters?playerVersion=HTML5.
             var youTubeVideoUrlTemplate =
@@ -148,7 +148,7 @@
                 var videoData = snapshot.val();
 
                 var playlist = videoData.playlist;
-                var videoId = playlist[0].youtube - key; // needs to cycle someday
+                var videoId = playlist[0]['youtube-key']; // needs to cycle someday
 
                 updateCurrentVideo(videoId);
             });
