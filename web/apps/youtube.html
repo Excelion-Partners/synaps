@@ -93,6 +93,8 @@
         <iframe id="videoIframeCenter" class="videoPlayer" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
     </div>
 
+    <div id="log"></div>
+
     <script>
         var href = window.location.href;
         var sidesQsParamLoc = href.indexOf("sides=");
@@ -113,6 +115,7 @@
         }
 
         function init() {
+            try {
             initSocket();
             _socket.on('connect', function () {
                 console.log('connected')
@@ -125,6 +128,10 @@
 
                 });
             });
+            }
+            catch (e) {
+                $('#log').html(JSON.stringify(e))
+            }
         }
 
         function init_firebase() {
@@ -146,13 +153,11 @@
                 var videoData = snapshot.val();
 
                 var playlist = videoData.playlist;
-                var videoId = playlist[0]; // needs to cycle someday
+                var videoId = playlist[0].youtube-key; // needs to cycle someday
 
                 updateCurrentVideo(videoId);
             });
         }
-
-        init();
 
         function initSocket() {
             var src = window.location.protocol + '//' + window.location.host;
@@ -162,6 +167,8 @@
 
             _socket.on('disconnect', function () {});
         }
+
+        init();
     </script>
 </body>
 
