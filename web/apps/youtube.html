@@ -97,11 +97,11 @@
 
     <script>
         var href = window.location.href;
-        var sidesQsParamLoc = href.indexOf("sides=");
-        var defaultNumOfSides = 1;
-        var sides = sidesQsParamLoc === -1 ? defaultNumOfSides : href.substring(sidesQsParamLoc + 6, sidesQsParamLoc +
-            7) * 1;
-        console.log("Set to " + sides + " sides.");
+        // var sidesQsParamLoc = href.indexOf("sides=");
+        // var defaultNumOfSides = 1;
+        // var sides = sidesQsParamLoc === -1 ? defaultNumOfSides : href.substring(sidesQsParamLoc + 6, sidesQsParamLoc +
+        //     7) * 1;
+        // console.log("Set to " + sides + " sides.");
 
         var _socket;
         var _flip;
@@ -116,20 +116,19 @@
 
         function init() {
             try {
-            initSocket();
-            _socket.on('connect', function () {
-                console.log('connected')
-                _socket.on('config', function (data) {
+                initSocket();
+                _socket.on('connect', function () {
+                    console.log('connected')
+                    _socket.on('config', function (data) {
 
-                    console.log('received config');
+                        console.log('received config');
 
-                    applyConfig(data);
-                    init_firebase();
+                        applyConfig(data);
+                        init_firebase();
 
+                    });
                 });
-            });
-            }
-            catch (e) {
+            } catch (e) {
                 $('#log').html(JSON.stringify(e))
             }
         }
@@ -153,7 +152,7 @@
                 var videoData = snapshot.val();
 
                 var playlist = videoData.playlist;
-                var videoId = playlist[0].youtube-key; // needs to cycle someday
+                var videoId = playlist[0].youtube - key; // needs to cycle someday
 
                 updateCurrentVideo(videoId);
             });
